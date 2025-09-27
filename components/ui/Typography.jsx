@@ -5,9 +5,7 @@ export const Text20 = ({ children, className }) => {
   return (
     <View>
       <Text
-        className={`text-[20px] font-[Montserrat] font-bold text-[#000000] ${
-          className || ""
-        }`}
+        className={`text-[20px] font-bold text-[#000000] ${className || ""}`}
         style={{ fontWeight: "700", lineHeight: 24, letterSpacing: 0 }}
       >
         {children}
@@ -36,7 +34,7 @@ export const Text16Bold = ({ children, className }) => {
   return (
     <View>
       <Text
-        className={`text-[14px] font-[Montserrat] font-semibold text-[#000000] ${
+        className={`text-[16px] font-[Montserrat] font-bold text-[#000000] ${
           className || ""
         }`}
       >
@@ -48,11 +46,7 @@ export const Text16Bold = ({ children, className }) => {
 export const Text14 = ({ children, className }) => {
   return (
     <View>
-      <Text
-        className={`text-[14px] font-[Montserrat] font-normal text-[#A5A5A5] ${
-          className || ""
-        }`}
-      >
+      <Text className={`text-[14px]  font-normal text-[#A5A5A5] ${className}`}>
         {children}
       </Text>
     </View>
@@ -63,9 +57,7 @@ export const Text12 = ({ children, className }) => {
   return (
     <View>
       <Text
-        className={`text-[12px] font-[Montserrat] font-normal text-[#A5A5A5] ${
-          className || ""
-        }`}
+        className={`text-[12px]  font-normal text-[#A5A5A5] ${className || ""}`}
       >
         {children}
       </Text>

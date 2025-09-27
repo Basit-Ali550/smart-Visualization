@@ -1,12 +1,12 @@
 import { View } from "react-native";
-import MaterialDetailsScreen from "./MaterialDetail/MaterialDetailsScreen";
+import SelectMaterialsScreen from "./SelectMaterials/SelectMaterials";
 
 // Validation schema using Yup
 
 const App = () => {
   return (
     <View className="flex-1">
-      <MaterialDetailsScreen />
+      <SelectMaterialsScreen />
     </View>
   );
 };
