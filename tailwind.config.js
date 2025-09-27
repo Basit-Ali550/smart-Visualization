@@ -1,3 +1,5 @@
+
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -14,6 +16,7 @@ module.exports = {
         black: "#000000",     // Pure black
         grayLight: "#A5A5A5", // Light gray
         grayDark: "#464646",  // Dark gray
+        background:"#F5F6FA"
       },
     },
   },
