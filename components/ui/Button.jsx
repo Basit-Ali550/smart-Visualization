@@ -16,9 +16,14 @@ const Button = ({
       bg: "bg-[#E02227]",
       text: "text-white",
     },
+    alpha: {
+      bg: "bg-[#fff]",
+      text: "text-[#0461A6]",
+    },
   };
 
-  const variantStyles = baseStyles[variant] || baseStyles.primary;
+  const variantStyles =
+    baseStyles[variant] || baseStyles.primary || baseStyles.alpha;
 
   return (
     <View>
@@ -31,7 +36,7 @@ const Button = ({
         } ${className || ""}`}
       >
         <Text
-          className={`text-[16px] font-[Montserrat] font-medium text-center ${variantStyles.text}`}
+          className={`text-[16px] font-[Montserrat] font-medium text-center ${variantStyles.text} `}
           style={{ fontWeight: "500", lineHeight: 24 }}
         >
           {children}

@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { Entypo, Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
@@ -6,29 +6,23 @@ import {
   Alert,
   Image,
   Modal,
-  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Your components
+import AiLight from "../../assets/images/AiLight.svg";
+import Back from "../../assets/images/back.svg";
+import BestPrectice from "../../assets/images/BestPrectice.jpg";
+import Picture from "../../assets/images/picture.svg";
+import Star from "../../assets/images/Star.svg";
+import UploadPicture from "../../assets/images/UploadPhoto.svg";
 import Button from "../../components/ui/Button";
-import { Text14, Text16Bold, Text20 } from "../../components/ui/Typography";
-
-// Add Text12 component if missing
-const Text12 = ({ children, className }) => {
-  return (
-    <Text
-      className={`text-[12px] font-[Montserrat] font-normal text-[#767C8C] ${
-        className || ""
-      }`}
-    >
-      {children}
-    </Text>
-  );
-};
+import Header from "../../components/ui/Header";
+import { Text12, Text14, Text16Bold } from "../../components/ui/Typography";
 
 const UploadPhotoScreen = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -202,23 +196,22 @@ const UploadPhotoScreen = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Header Section */}
-        <View className="px-6 pt-6 pb-4">
-          <View className="flex-row items-center mb-6">
-            <TouchableOpacity onPress={() => router.back()} className="mr-4">
-              <Feather name="arrow-left" size={24} color="#000000" />
-            </TouchableOpacity>
-            <View>
-              <Text20 className="text-[24px] font-bold">Upload Photo</Text20>
-            </View>
-          </View>
 
+        <Header
+          left={<Back />}
+          onLeftPress={() => router.back()}
+          title="Upload Photo"
+          rightWidth={60}
+        />
+
+        <View className="p-6   bg-white rounded-lg">
           {/* Main Content */}
           <View className="items-center mb-8">
-            <View className="w-24 h-24 bg-blue-50 rounded-full items-center justify-center mb-4">
-              <Feather name="upload" size={40} color="#0461A6" />
+            <View className="mb-4">
+              <UploadPicture />
             </View>
             <Text16Bold className="font-bold text-center mb-2">
               Upload Your {roomType} Photo
@@ -230,37 +223,28 @@ const UploadPhotoScreen = () => {
           </View>
 
           {/* AI Guidance */}
-          <View className="bg-yellow-50 rounded-xl p-4 mb-6">
-            <View className="flex-row items-start">
-              <Feather
-                name="info"
-                size={16}
-                color="#D97706"
-                style={{ marginTop: 2, marginRight: 8 }}
-              />
-              <View className="flex-1">
-                <Text14 className="text-[#D97706] font-semibold mb-1">
-                  AI guidance:
-                </Text14>
-                <Text14 className="text-[#D97706]">
-                  Make sure your room is well-lit for best results
-                </Text14>
+          <View className="border-l-primary rounded-md border-l-[3px] mb-6">
+            <View className="bg-background  rounded-xl p-4  ">
+              <View className="flex-row items-start gap-3">
+                <AiLight />
+                <View className="flex-1">
+                  <Text14 className="text-grayLight">
+                    AI guidance: Make sure your room is well-lit for best
+                    results
+                  </Text14>
+                </View>
               </View>
             </View>
           </View>
-        </View>
 
-        {/* Upload Options */}
-        <View className="px-6 mb-8">
-          <View className="flex-row space-x-4">
+          <View className="flex gap-6">
             {/* Gallery Upload */}
             <TouchableOpacity
               onPress={pickImageFromGallery}
-              className="flex-1 bg-gray-50 rounded-2xl p-6 items-center border-2 border-dashed border-gray-300"
+              className=" flex-row justify-center gap-4 bg-gray-50 rounded-2xl py-4  items-center border-2 border-dashed border-primary "
             >
-              <View className="w-16 h-16 bg-white rounded-full items-center justify-center mb-3 border border-gray-200">
-                <Feather name="image" size={28} color="#0461A6" />
-              </View>
+              <Picture />
+
               <Text16Bold className="text-center mb-1">
                 Upload from gallery
               </Text16Bold>
@@ -269,32 +253,52 @@ const UploadPhotoScreen = () => {
             {/* Camera Upload */}
             <TouchableOpacity
               onPress={takePhoto}
-              className="flex-1 bg-gray-50 rounded-2xl p-6 items-center border-2 border-dashed border-gray-300"
+              className=" flex-row justify-center itme gap-4 bg-[#E6EFF699] rounded-2xl py-4  items-center border-2 border-dashed border-[#20C375] "
             >
-              <View className="w-16 h-16 bg-white rounded-full items-center justify-center mb-3 border border-gray-200">
-                <Feather name="camera" size={28} color="#0461A6" />
-              </View>
-              <Text16Bold className="text-center mb-1">Take a photo</Text16Bold>
+              <Entypo name="camera" size={28} color="#20C375" />
+              <Text16Bold className="text-center pt-1 mb-1 text-[#20C375]">
+                Take a photo
+              </Text16Bold>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Best Practices Section */}
-        <View className="px-6 mb-8">
-          <Text16Bold className="mb-3">Best Practices Examples</Text16Bold>
-          <Text14 className="text-[#767C8C] mb-4">
+        <View className=" p-6 my-6  bg-white rounded-xl">
+          <View className="flex-row items-center gap-3 ">
+            <Star />
+            <Text16Bold className="">Best Practices Examples</Text16Bold>
+          </View>
+          <Text14 className="text-[#767C8C] my-3 ">
             Follow these examples for the best visualization results
           </Text14>
 
-          <View className="flex-row">
-            {bestPractices.map((practice) => (
-              <BestPracticeCard key={practice.id} practice={practice} />
-            ))}
+          <View className="flex-row gap-3">
+            <View className="relative w-[49%] h-[130] rounded-lg overflow-hidden">
+              <Image
+                source={BestPrectice}
+                resizeMode="cover"
+                className="w-[100%] h-[100%] rounded-lg"
+              />
+              <View className="bg-LightGreen absolute rounded-md right-2 top-2">
+                <Text className="text-white p-2 ">Best Exmaple</Text>
+              </View>
+            </View>
+            <View className="relative w-[49%] h-[130] rounded-lg overflow-hidden">
+              <Image
+                source={BestPrectice}
+                resizeMode="cover"
+                className="w-[100%] h-[100%]"
+              />
+              <View className="bg-DardkRed absolute rounded-md right-2 top-2">
+                <Text className="text-white p-2 ">Avoid This</Text>
+              </View>
+            </View>
           </View>
         </View>
 
         {/* Continue Button */}
-        <View className="px-6 pb-8">
+        <View className="pb-8">
           <Button
             variant="primary"
             className="w-full"
@@ -303,7 +307,7 @@ const UploadPhotoScreen = () => {
                 ? setShowConfirmation(true)
                 : Alert.alert("Please select a photo first")
             }
-            disabled={!selectedImage}
+            // disabled={!selectedImage}
           >
             Continue
           </Button>

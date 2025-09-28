@@ -16,7 +16,9 @@ module.exports = {
         black: "#000000",     // Pure black
         grayLight: "#A5A5A5", // Light gray
         grayDark: "#464646",  // Dark gray
-        background:"#F5F6FA"
+         background:"#F5F6FA",
+        LightGreen: "#20C375",
+        DardkRed: "#E02227"
       },
     },
   },
