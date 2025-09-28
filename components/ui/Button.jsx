@@ -20,6 +20,10 @@ const Button = ({
       bg: "bg-[#fff]",
       text: "text-[#0461A6]",
     },
+    beta: {
+      bg: "bg-[#EBEDF0]",
+      text: "text-[#464646]",
+    },
   };
 
   const variantStyles =
