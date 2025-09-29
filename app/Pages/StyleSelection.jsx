@@ -129,7 +129,6 @@ const DesignStylesScreen = () => {
             onLeftPress={() => router.back()}
             title="Select Style"
             right={""}
-            onRightPress={() => setIsModalVisible(true)}
             rightWidth={60}
           />
         </View>
