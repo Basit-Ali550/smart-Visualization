@@ -1,17 +1,18 @@
 import { Feather } from "@expo/vector-icons"; // Import Expo icon
 import { useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
-
+import Back from "../../assets/images/back.svg";
 // Import images using require
 const Frame = require("../../assets/images/Frame.png");
 const Frame1 = require("../../assets/images/Frame (1).png");
 const Frame2 = require("../../assets/images/Frame (2).png");
 const Frame4 = require("../../assets/images/Frame (4).png");
-
 // Your components
 import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../../components/ui/Button";
+import Header from "../../components/ui/Header";
 import {
   Text12,
   Text14,
@@ -74,7 +75,7 @@ const roomTypes = [
 const ExteriorDesigncreen = () => {
   const navigation = useNavigation();
   const [selectedRoom, setSelectedRoom] = useState(null);
-
+  const router = useRouter();
   const handleContinue = () => {
     if (selectedRoom) {
       navigation.navigate("Pages/UploadPhoto");
@@ -126,12 +127,20 @@ const ExteriorDesigncreen = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-50">
+    <SafeAreaView className="flex-1 ">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Header Section */}
-        <View className="pt-6 pb-4">
+        <Header
+          left={<Back />}
+          onLeftPress={() => router.back()}
+          title=""
+          right={""}
+          onRightPress={() => setIsModalVisible(true)}
+          rightWidth={60}
+        />
+        <View className="pb-4">
           <View className="flex-row items-center mb-4">
-            <View className="flex-1 mt-5">
+            <View className="flex-1">
               <Text20 className="">Interior Design</Text20>
               <Text14 className="">
                 Transform your indoor spaces with our design tools.

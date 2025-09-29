@@ -744,7 +744,7 @@ const DashboardScreen = () => {
   const renderSection = ({ item }) => (
     <View>
       {item.type === "header" && (
-        <View className="pt-6 pb-4">
+        <View className="pb-4">
           <View className="flex-row justify-between items-center mb-4">
             <View>
               <Text className="text-[#464646] text-[24px] font-bold">
