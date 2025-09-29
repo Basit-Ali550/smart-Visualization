@@ -1,20 +1,24 @@
 import { Feather } from "@expo/vector-icons";
 import { Formik } from "formik";
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
+  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import * as yup from "yup";
 
 // Your components
+import Logo from "../../../assets/Icon/Logo.svg";
 import Button from "../../../components/ui/Button";
 import InputField from "../../../components/ui/InputFeild";
-import { Text14, Text16Bold, Text20 } from "../../../components/ui/Typography";
-
+import { Text14, Text16, Text20 } from "../../../components/ui/Typography";
+const FaceBook = require("../../../assets/images/Facebook.png");
+const Google = require("../../../assets/images/Google.png");
 const SignUpScreen = ({ navigation }) => {
   const signUpValidationSchema = yup.object().shape({
     firstName: yup.string().required("First name is required"),
@@ -40,7 +44,7 @@ const SignUpScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -50,15 +54,18 @@ const SignUpScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
         >
           {/* Header Section */}
-          <View className="items-center pt-10 pb-6">
-            <Text20 className="text-[28px] mb-2">unitec</Text20>
-            <Text16Bold className="text-[18px] text-center mb-1">
-              Visualize Smarter Living
-            </Text16Bold>
+          <View className="py-4">
+            <View className="flex-row justify-center mb-6">
+              <Logo />
+            </View>
+            <Text20>Visualize Smarter Living</Text20>
+            <Text16 className="mt-1">
+              Transform your spaces with confidence
+            </Text16>
           </View>
 
           {/* Sign Up Form */}
-          <View className="flex-1 px-6">
+          <View className="flex-1 ">
             <Formik
               initialValues={{
                 firstName: "",
@@ -81,7 +88,7 @@ const SignUpScreen = ({ navigation }) => {
                     leftIcon={Feather}
                     leftIconName="user"
                     required={true}
-                    className="mb-4"
+                    className="mb-5"
                   />
 
                   {/* Last Name Input */}
@@ -93,7 +100,7 @@ const SignUpScreen = ({ navigation }) => {
                     leftIcon={Feather}
                     leftIconName="user"
                     required={true}
-                    className="mb-4"
+                    className="mb-5"
                   />
 
                   {/* Phone Number Input */}
@@ -105,7 +112,7 @@ const SignUpScreen = ({ navigation }) => {
                     leftIcon={Feather}
                     leftIconName="phone"
                     required={true}
-                    className="mb-4"
+                    className="mb-5"
                   />
 
                   {/* Email Input */}
@@ -117,7 +124,7 @@ const SignUpScreen = ({ navigation }) => {
                     leftIcon={Feather}
                     leftIconName="mail"
                     required={true}
-                    className="mb-4"
+                    className="mb-5"
                   />
 
                   {/* Password Input */}
@@ -129,7 +136,7 @@ const SignUpScreen = ({ navigation }) => {
                     leftIcon={Feather}
                     leftIconName="lock"
                     required={true}
-                    className="mb-6"
+                    className="mb-10"
                   />
 
                   {/* Sign Up Button */}
@@ -150,24 +157,32 @@ const SignUpScreen = ({ navigation }) => {
                   </View>
 
                   {/* Social Login Buttons */}
-                  <View className="flex-row justify-center space-x-4 mb-8">
-                    <TouchableOpacity className="w-12 h-12 border border-[#E5E5E5] rounded-[10px] items-center justify-center">
-                      <Feather name="facebook" size={24} color="#0461A6" />
+                  <View className="flex-row  gap-4 justify-center space-x-4 mb-8">
+                    <TouchableOpacity className="w-16 h-16 bg-white   rounded-full  items-center justify-center">
+                      <Image
+                        source={FaceBook}
+                        style={{ width: 24, height: 24 }}
+                        resizeMode="contain"
+                      />
                     </TouchableOpacity>
-                    <TouchableOpacity className="w-12 h-12 border border-[#E5E5E5] rounded-[10px] items-center justify-center">
-                      <Feather name="github" size={24} color="#0461A6" />
+                    <TouchableOpacity className="w-16 h-16 bg-white   rounded-full  items-center justify-center">
+                      <Image
+                        source={Google}
+                        style={{ width: 24, height: 24 }}
+                        resizeMode="contain"
+                      />
                     </TouchableOpacity>
                   </View>
 
                   {/* Login Link */}
-                  <View className="flex-row justify-center items-center mb-8">
-                    <Text14>Already have an account? </Text14>
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate("Login")}
-                    >
-                      <Text14 className="text-[#0461A6] font-semibold">
+                  <View className="flex-row justify-center items-center">
+                    <Text className="text-[#000000] font-normal text-xs">
+                      Already have an account?
+                    </Text>
+                    <TouchableOpacity>
+                      <Text className="text-[#0461A6] text-sm font-semibold">
                         Log in
-                      </Text14>
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
