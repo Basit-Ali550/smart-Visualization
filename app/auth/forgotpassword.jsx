@@ -4,12 +4,14 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import * as yup from "yup";
 
 // Your components
+import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../../components/ui/Button";
 import InputField from "../../components/ui/InputFeild";
 import { Text14, Text20 } from "../../components/ui/Typography";
 
-const ForgotPasswordScreen = ({ navigation }) => {
+const ForgotPasswordScreen = () => {
+  const navigation = useNavigation();
   const forgotPasswordValidationSchema = yup.object().shape({
     email: yup
       .string()
@@ -18,7 +20,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
   });
 
   const handleContinue = (values) => {
-    console.log("Forgot password values:", values);
+    navigation.navigate("auth/otpscreen");
     // Handle forgot password logic here
     // Typically you would send a reset password email
   };

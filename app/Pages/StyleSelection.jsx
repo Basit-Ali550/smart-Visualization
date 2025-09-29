@@ -95,15 +95,17 @@
 // export default DesignStylesScreen;
 
 import { Feather } from "@expo/vector-icons"; // 👈 make sure installed
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Ai from "../../assets/Icon/Ai.svg";
+import Back from "../../assets/images/back.svg";
 import Button from "../../components/ui/Button";
+import Header from "../../components/ui/Header";
 import { Text12 } from "../../components/ui/Typography";
-
 const DesignStylesScreen = () => {
   const [selectedStyle, setSelectedStyle] = useState(null);
-
+  const router = useRouter();
   const stylesData = [
     { id: 1, name: "Modern Living Room", date: "Today" },
     { id: 2, name: "Modern Living Room", date: "Today" },
@@ -121,8 +123,18 @@ const DesignStylesScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
+        <View className="mt-6">
+          <Header
+            left={<Back />}
+            onLeftPress={() => router.back()}
+            title="Select Style"
+            right={""}
+            onRightPress={() => setIsModalVisible(true)}
+            rightWidth={60}
+          />
+        </View>
         {/* AI Suggestion Box */}
-        <View className="bg-[#0461A6] p-4 my-6 overflow-hidden rounded-2xl">
+        <View className="bg-[#0461A6] p-4 mb-6 overflow-hidden rounded-2xl">
           <View className="flex-row  gap-3 mb-4">
             <Ai />
             <View>
@@ -195,7 +207,7 @@ const DesignStylesScreen = () => {
       {/* Continue Button (Bottom fixed) */}
       <View className="absolute bottom-4 w-full">
         <Button
-          onPress={() => console.log("Continue to color")}
+          onPress={() => router.push("Pages/RecommendedStyles")}
           className="w-full"
         >
           Continue to color

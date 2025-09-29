@@ -4,12 +4,15 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import * as yup from "yup";
 
 // Your components
+import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../../components/ui/Button";
 import InputField from "../../components/ui/InputFeild";
 import { Text14, Text20 } from "../../components/ui/Typography";
 
-const NewPasswordScreen = ({ navigation }) => {
+const NewPasswordScreen = () => {
+  const navigation = useNavigation();
+
   const newPasswordValidationSchema = yup.object().shape({
     password: yup
       .string()
@@ -26,7 +29,7 @@ const NewPasswordScreen = ({ navigation }) => {
   });
 
   const handleResetPassword = (values) => {
-    console.log("New password values:", values);
+    navigation.navigate("auth/login");
     // Handle password reset logic here
     // Typically you would update the password via API
   };

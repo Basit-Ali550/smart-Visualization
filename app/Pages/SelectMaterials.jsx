@@ -1,18 +1,17 @@
-import { Feather } from "@expo/vector-icons";
+import { AntDesign, Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Dimensions,
   FlatList,
   Image,
-  SafeAreaView,
   ScrollView,
-  TextInput,
+  Text,
   TouchableOpacity,
   View,
 } from "react-native";
-
-// Your components
-import { Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Button from "../../components/ui/Button";
 import {
   Text12,
   Text14,
@@ -20,81 +19,69 @@ import {
   Text20,
 } from "../../components/ui/Typography";
 
+// Your provided Button component
+
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48) / 2; // 48 = padding (24*2)
-
-// Mock data (same as above)
 
 const mockProjects = [
   {
     id: 1,
-    title: "Modern Living Room",
+    title: "$4.99/sq ft",
     type: "Interior",
     image:
       "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=200&fit=crop",
     quality: "High-quality image",
-    likes: 45,
-    views: 45,
     createdAt: "2024-01-15",
     category: "Living Room",
   },
   {
     id: 2,
-    title: "Scandinavian Kitchen",
+    title: "$4.99/sq ft",
     type: "Interior",
     image:
       "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=200&fit=crop",
     quality: "High-quality image",
-    likes: 45,
-    views: 45,
     createdAt: "2024-01-10",
     category: "Kitchen",
   },
   {
     id: 3,
-    title: "Minimalist Bedroom",
+    title: "$4.99/sq ft",
     type: "Interior",
     image:
       "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=300&h=200&fit=crop",
     quality: "High-quality image",
-    likes: 45,
-    views: 45,
     createdAt: "2024-01-05",
     category: "Bedroom",
   },
   {
     id: 4,
-    title: "Contemporary Exterior",
+    title: "$4.99/sq ft",
     type: "Exterior",
     image:
       "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=300&h=200&fit=crop",
     quality: "High-quality image",
-    likes: 45,
-    views: 45,
     createdAt: "2024-01-01",
     category: "Exterior",
   },
   {
     id: 5,
-    title: "Modern Dining Room",
+    title: "$4.99/sq ft",
     type: "Interior",
     image:
       "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=300&h=200&fit=crop",
     quality: "High-quality image",
-    likes: 45,
-    views: 45,
     createdAt: "2023-12-28",
     category: "Dining Room",
   },
   {
     id: 6,
-    title: "Luxury Bathroom",
+    title: "$4.99/sq ft",
     type: "Interior",
     image:
       "https://images.unsplash.com/photo-1584621247940-688ce92e3e2e?w=300&h=200&fit=crop",
     quality: "High-quality image",
-    likes: 45,
-    views: 45,
     createdAt: "2023-12-25",
     category: "Bathroom",
   },
@@ -109,11 +96,12 @@ const filters = [
   { id: "job1", label: "Hammy" },
 ];
 
-const MyProjectsScreen = () => {
+const SelectMaterialsScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [projects, setProjects] = useState(mockProjects);
-
+  const [selectedProjectId, setSelectedProjectId] = useState(null); // Track selected project
+  const router = useRouter();
   const filteredProjects = projects.filter((project) => {
     const matchesSearch = project.title
       .toLowerCase()
@@ -140,46 +128,50 @@ const MyProjectsScreen = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const ProjectGridCard = ({ project }) => (
-    <TouchableOpacity
-      className="bg-white p-3 rounded-[12px] shadow-sm overflow-hidden mb-4"
-      style={{ width: CARD_WIDTH }}
-    >
-      <Image
-        source={{ uri: project.image }}
-        className="w-full rounded-[8px]  h-24"
-        resizeMode="cover"
-      />
+  const ProjectGridCard = ({ project }) => {
+    const isSelected = project.id === selectedProjectId;
 
-      <View className="">
-        <Text
-          className="font-semibold text-[#000000] text-sm mt-1"
-          numberOfLines={1}
-        >
-          {project.title}
-        </Text>
-        <Text12
-          className="text-[#A5A5A5] text-[10px] font-normal mb-1"
-          numberOfLines={1}
-        >
-          {project.quality}
-        </Text12>
-
-        <View className="flex-row justify-between gap-3 items-center">
-          <View className="flex-row items-center space-x-2">
-            <View className="flex-row items-center">
-              <Feather name="heart" size={12} color="#000000" />
-              <Text12 className="text-[#767C8C] ml-1">{project.likes}</Text12>
-            </View>
-            <View className="flex-row items-center">
-              <Feather name="eye" size={12} color="#000000" />
-              <Text12 className="text-[#767C8C] ml-1">{project.views}</Text12>
+    return (
+      <TouchableOpacity
+        onPress={() => setSelectedProjectId(project.id)} // Toggle selection
+        className={`bg-white rounded-[12px] shadow-sm overflow-hidden mb-4 ${
+          isSelected ? "border border-[#0461A6]" : ""
+        }`} // Add 1px border if selected
+        style={{ width: CARD_WIDTH }}
+      >
+        <Image
+          source={{ uri: project.image }}
+          className="w-full h-[120px] rounded-t-[8px]"
+          resizeMode="cover"
+        />
+        {isSelected && (
+          <View className="absolute top-2 right-2 flex justify-center items-center w-5 h-5 bg-[#0461A6] rounded-full">
+            <Feather name="check" size={14} color="#FFFFFF" />
+          </View>
+        )}
+        <View className="p-2">
+          <View className="flex-row flex justify-between">
+            <Text
+              className="font-semibold text-[#000000] text-sm mt-1"
+              numberOfLines={1}
+            >
+              {project.title}
+            </Text>
+            <View className="flex-row items-center space-x-1.5">
+              <AntDesign name="star" size={12} color="#FFC900" />
+              <Text className="font-semibold text-[#000000] text-sm">4.7</Text>
             </View>
           </View>
+          <Text12
+            className="text-[#A5A5A5] text-[10px] font-normal"
+            numberOfLines={1}
+          >
+            {project.quality}
+          </Text12>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   const FilterButton = ({ filter, isActive, onPress }) => (
     <TouchableOpacity
@@ -188,42 +180,21 @@ const MyProjectsScreen = () => {
         isActive ? "bg-[#0461A6]" : "bg-[#EBEDF0]"
       }`}
     >
-      <Text14 className={isActive ? "text-white " : "text-[#464646]"}>
+      <Text14 className={isActive ? "text-white" : "text-[#464646]"}>
         {filter.label}
       </Text14>
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-50">
+    <SafeAreaView className="flex-1 ">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Header Section */}
-        <View className="bg-blue-50 px-6 pt-6 pb-4">
-          <View className="flex-row justify-between items-center mb-6">
-            <Text20 className="text-[24px] font-bold">My Projects</Text20>
-            <TouchableOpacity className="p-2">
-              <Feather name="plus" size={24} color="#0461A6" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Search Bar */}
-          <View className="mb-4">
-            <View className="flex-row items-center bg-white rounded-xl px-4 py-3">
-              <Feather name="search" size={20} color="#767C8C" />
-              <TextInput
-                placeholder="Search designs..."
-                placeholderTextColor="#767C8C"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                className="flex-1 ml-3 text-[16px] font-[Montserrat]"
-                style={{ fontWeight: "500" }}
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchQuery("")}>
-                  <Feather name="x" size={20} color="#767C8C" />
-                </TouchableOpacity>
-              )}
-            </View>
+        <View className=" pt-2 pb-4">
+          <View className="flex-row justify-center items-center mb-6">
+            <Text20 className="text-[18px] text-[#464646] text-center font-bold">
+              My Projects
+            </Text20>
           </View>
 
           {/* Filter Tabs */}
@@ -245,8 +216,14 @@ const MyProjectsScreen = () => {
           </View>
         </View>
 
+        <View className=" mb-4">
+          <Text16Bold>Material Catalog</Text16Bold>
+          <Text12 className="mt-1">
+            Select materials to apply to your design
+          </Text12>
+        </View>
         {/* Projects Grid */}
-        <View className="px-6 pt-4 pb-8">
+        <View className=" pt-4 pb-8">
           {filteredProjects.length > 0 ? (
             <FlatList
               data={filteredProjects}
@@ -270,10 +247,19 @@ const MyProjectsScreen = () => {
               </Text14>
             </View>
           )}
+          <View>
+            <Button
+              onPress={() => router.push("Pages/MaterialDetails")}
+              variant="primary"
+              className="w-full"
+            >
+              Visualize my design
+            </Button>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default MyProjectsScreen;
+export default SelectMaterialsScreen;

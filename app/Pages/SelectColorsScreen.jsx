@@ -1,24 +1,24 @@
-import React, { useState } from "react";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView,
-  Modal,
-  TextInput,
   Alert,
   Dimensions,
   Image,
+  Modal,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Stack, useRouter } from "expo-router";
 import Back from "../../assets/images/back.svg";
 import Plus from "../../assets/images/Plus.svg";
 import SelectColor from "../../assets/images/SelectColor.jpg";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Text14, Text16Bold } from "../../components/ui/Typography";
-import Header from "../../components/ui/Header";
 import Button from "../../components/ui/Button";
+import Header from "../../components/ui/Header";
+import { Text14, Text16Bold } from "../../components/ui/Typography";
 
 // --- 1. Data Structure & Setup ---
 
@@ -167,6 +167,7 @@ const SelectColorsScreen = () => {
     if (selectedPalette) {
       // 🔑 AI Data Note: The array of hex codes is the data you pass to your AI
       console.log("Colors to send to AI:", selectedPalette.colors);
+      router.push("Pages/SelectMaterials");
       Alert.alert(
         "AI Input Ready",
         `Sending ${selectedPalette.colors.length} colors to the AI engine.`
@@ -197,7 +198,7 @@ const SelectColorsScreen = () => {
     };
 
     setSelectedPalette(newPalette);
-    MOCK_PALETTES.push(newPalette)
+    MOCK_PALETTES.push(newPalette);
     setIsModalVisible(false);
     setNewColorHex("#3a86ff");
   };
@@ -205,7 +206,7 @@ const SelectColorsScreen = () => {
   return (
     <SafeAreaView className="flex-1">
       {/* Expo Router Header Configuration */}
-
+      <View className="mt-6"></View>
       <Header
         left={<Back />}
         onLeftPress={() => router.back()}

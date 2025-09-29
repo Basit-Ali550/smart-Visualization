@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -12,7 +13,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../../components/ui/Button";
 import { Text14, Text20 } from "../../components/ui/Typography";
 
-const OtpVerificationScreen = ({ navigation }) => {
+const OtpVerificationScreen = () => {
+  const navigation = useNavigation();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(60); // 1 minute timer
   const inputs = useRef([]);
@@ -50,7 +52,7 @@ const OtpVerificationScreen = ({ navigation }) => {
   };
 
   const handleVerify = () => {
-    console.log("Entered OTP:", otp.join(""));
+    navigation.navigate("auth/newpassword");
     // Add verify logic
   };
 

@@ -1,5 +1,6 @@
+import { Redirect } from "expo-router";
 import "../global.css";
 
 export default function App() {
-  return;
+  return <Redirect href="auth/login" />;
 }

@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native"; // Import useNavigation hook
 import { Formik } from "formik";
 import {
   Image,
@@ -9,10 +10,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as yup from "yup";
 import Logo from "../../assets/Icon/Logo.svg";
-// Your components
-import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../../components/ui/Button";
 import InputField from "../../components/ui/InputFeild";
 import { Text14, Text16, Text20 } from "../../components/ui/Typography";
@@ -20,7 +20,10 @@ import { Text14, Text16, Text20 } from "../../components/ui/Typography";
 // Import PNG images
 const FaceBook = require("../../assets/images/Facebook.png");
 const Google = require("../../assets/images/Google.png");
+
 const LoginScreen = () => {
+  const navigation = useNavigation(); // Initialize navigation hook
+
   const loginValidationSchema = yup.object().shape({
     email: yup
       .string()
@@ -34,6 +37,7 @@ const LoginScreen = () => {
 
   const handleLogin = (values) => {
     console.log("Login values:", values);
+    navigation.navigate("Pages/Home");
     // Handle login logic here
   };
 
@@ -59,7 +63,7 @@ const LoginScreen = () => {
           </View>
 
           {/* Login Form */}
-          <View className="flex-1  pt-8">
+          <View className="flex-1 pt-8">
             <Formik
               initialValues={{ email: "", password: "", rememberMe: false }}
               validationSchema={loginValidationSchema}
@@ -113,7 +117,9 @@ const LoginScreen = () => {
                       <Text14>Remember me</Text14>
                     </TouchableOpacity>
 
-                    <TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("auth/forgotpassword")}
+                    >
                       <Text className="text-[#0461A6] text-sm font-normal">
                         Forgot password?
                       </Text>
@@ -138,15 +144,15 @@ const LoginScreen = () => {
                   </View>
 
                   {/* Social Login Buttons */}
-                  <View className="flex-row  gap-4 justify-center space-x-4 mb-8">
-                    <TouchableOpacity className="w-16 h-16 bg-white   rounded-full  items-center justify-center">
+                  <View className="flex-row gap-4 justify-center space-x-4 mb-8">
+                    <TouchableOpacity className="w-16 h-16 bg-white rounded-full items-center justify-center">
                       <Image
                         source={FaceBook}
                         style={{ width: 24, height: 24 }}
                         resizeMode="contain"
                       />
                     </TouchableOpacity>
-                    <TouchableOpacity className="w-16 h-16 bg-white   rounded-full  items-center justify-center">
+                    <TouchableOpacity className="w-16 h-16 bg-white rounded-full items-center justify-center">
                       <Image
                         source={Google}
                         style={{ width: 24, height: 24 }}
@@ -160,7 +166,9 @@ const LoginScreen = () => {
                     <Text className="text-[#000000] font-normal text-xs">
                       Don't have an account?{" "}
                     </Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("auth/signup")} // Navigate to SignUp screen
+                    >
                       <Text className="text-[#0461A6] text-sm font-semibold">
                         Sign up
                       </Text>

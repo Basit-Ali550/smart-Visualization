@@ -1,13 +1,6 @@
 import { Feather } from "@expo/vector-icons"; // Import Expo icon
 import { useState } from "react";
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 // Import images using require
 const Frame = require("../../assets/images/Frame.png");
@@ -16,6 +9,8 @@ const Frame2 = require("../../assets/images/Frame (2).png");
 const Frame4 = require("../../assets/images/Frame (4).png");
 
 // Your components
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../../components/ui/Button";
 import {
   Text12,
@@ -76,12 +71,13 @@ const roomTypes = [
   },
 ];
 
-const InteriorDesignScreen = ({ navigation }) => {
+const InteriorDesignScreen = () => {
+  const navigation = useNavigation();
   const [selectedRoom, setSelectedRoom] = useState(null);
 
   const handleContinue = () => {
     if (selectedRoom) {
-      navigation.navigate("StyleSelection", { roomType: selectedRoom });
+      navigation.navigate("Pages/UploadPhoto");
     }
   };
 
@@ -131,12 +127,12 @@ const InteriorDesignScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView className="flex-1 bg-blue-50">
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1 px-6">
+      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Header Section */}
         <View className="pt-6 pb-4">
           <View className="flex-row items-center mb-6">
             <View className="flex-1 mt-5">
-              <Text20 className="">Select Exterior Element</Text20>
+              <Text20 className="">Exterior Design</Text20>
               <Text14 className="">
                 Transform your indoor spaces with our design tools.
               </Text14>

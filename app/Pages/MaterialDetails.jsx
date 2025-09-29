@@ -1,16 +1,27 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useRouter } from "expo-router";
 import { Image, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Back from "../../assets/images/back.svg";
 import Button from "../../components/ui/Button";
+import Header from "../../components/ui/Header";
 import { Text12, Text14, Text16Bold } from "../../components/ui/Typography";
 const Frame5 = require("../../assets/images/Frame 5.png");
 const MaterialDetails = () => {
+  const router = useRouter();
   return (
     <SafeAreaView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1 ">
         {/* Header Section */}
-        <View className="mb-6">
-          <Text16Bold className={"text-center"}>Material Details</Text16Bold>
+        <View className="">
+          <Header
+            left={<Back />}
+            onLeftPress={() => router.back()}
+            title="Material Details"
+            right={""}
+            onRightPress={() => setIsModalVisible(true)}
+            rightWidth={60}
+          />
         </View>
         <View className="relative">
           <Image source={Frame5} className="w-full h-[140px] rounded-2xl" />
@@ -118,7 +129,9 @@ const MaterialDetails = () => {
 
         {/* Button */}
         <View className="mb-6">
-          <Button>Add to my materials</Button>
+          <Button onPress={() => router.push("Pages/SaveExportDesign")}>
+            Add to my materials
+          </Button>
         </View>
       </ScrollView>
     </SafeAreaView>

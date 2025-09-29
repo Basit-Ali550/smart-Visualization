@@ -12,6 +12,8 @@ import {
 import * as yup from "yup";
 
 // Your components
+
+import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Logo from "../../assets/Icon/Logo.svg";
 import Button from "../../components/ui/Button";
@@ -19,7 +21,8 @@ import InputField from "../../components/ui/InputFeild";
 import { Text14, Text16, Text20 } from "../../components/ui/Typography";
 const FaceBook = require("../../assets/images/Facebook.png");
 const Google = require("../../assets/images/Google.png");
-const SignUpScreen = ({ navigation }) => {
+const SignUpScreen = () => {
+  const navigation = useNavigation();
   const signUpValidationSchema = yup.object().shape({
     firstName: yup.string().required("First name is required"),
     lastName: yup.string().required("Last name is required"),
@@ -40,6 +43,7 @@ const SignUpScreen = ({ navigation }) => {
 
   const handleSignUp = (values) => {
     console.log("Sign up values:", values);
+    navigation.navigate("auth/login");
     // Handle sign up logic here
   };
 
@@ -179,7 +183,9 @@ const SignUpScreen = ({ navigation }) => {
                     <Text className="text-[#000000] font-normal text-xs">
                       Already have an account?
                     </Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("auth/login")}
+                    >
                       <Text className="text-[#0461A6] text-sm font-semibold">
                         Log in
                       </Text>

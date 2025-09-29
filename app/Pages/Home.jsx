@@ -635,6 +635,7 @@
 // export default DashboardScreen;
 
 import { EvilIcons, FontAwesome5, Ionicons } from "@expo/vector-icons"; // Add FontAwesome5
+import { useNavigation } from "@react-navigation/native";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Exterior from "../../assets/Icon/Exterior.svg";
@@ -684,10 +685,14 @@ const mockData = {
   ],
 };
 
-const DashboardScreen = ({ navigation }) => {
+const DashboardScreen = () => {
   // Render recent project item
+  const navigation = useNavigation();
   const renderProjectItem = ({ item }) => (
-    <TouchableOpacity className="p-3 bg-white flex-1 m-2 rounded-xl">
+    <TouchableOpacity
+      onPress={() => navigation.navigate("Profile/ProfileScreen")}
+      className="p-3 bg-white flex-1 m-2 rounded-xl"
+    >
       <View className="relative">
         <Image
           source={{ uri: item.image }}
@@ -753,14 +758,19 @@ const DashboardScreen = ({ navigation }) => {
               <TouchableOpacity className="w-10 h-10 rounded-full bg-white justify-center items-center">
                 <EvilIcons name="search" size={24} color="black" />
               </TouchableOpacity>
-              <TouchableOpacity className="w-10 h-10 rounded-full bg-white justify-center items-center">
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Pages/Notification")}
+                className="w-10 h-10 rounded-full bg-white justify-center items-center"
+              >
                 <Ionicons
                   name="notifications-outline"
                   size={24}
                   color="black"
                 />
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Pages/ProfileScreen")}
+              >
                 <Image
                   source={{ uri: mockData.user.avatar }}
                   className="w-10 h-10 rounded-full"
@@ -786,7 +796,12 @@ const DashboardScreen = ({ navigation }) => {
               </Text14>
             </View>
           </View>
-          <Button variant="primary">Start project</Button>
+          <Button
+            onPress={() => navigation.navigate("Pages/InteriorDesign")}
+            variant="primary"
+          >
+            Start project
+          </Button>
         </View>
       )}
       {item.type === "exteriorDesign" && (
@@ -806,14 +821,21 @@ const DashboardScreen = ({ navigation }) => {
               </Text14>
             </View>
           </View>
-          <Button variant="primary">Start project</Button>
+          <Button
+            onPress={() => navigation.navigate("Pages/ExteriorDesign")}
+            variant="primary"
+          >
+            Start project
+          </Button>
         </View>
       )}
       {item.type === "recentProjects" && (
         <View className="mt-3 mb-6 ">
           <View className="flex-row justify-between items-center mb-4">
             <Text16Bold>Recent Projects</Text16Bold>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Pages/MyProjectsScreen")}
+            >
               <Text className="text-[#0461A6]">View all</Text>
             </TouchableOpacity>
           </View>
@@ -832,7 +854,9 @@ const DashboardScreen = ({ navigation }) => {
         <View className="mb-6">
           <View className="flex-row justify-between items-center mb-4">
             <Text16Bold>Popular Styles</Text16Bold>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Pages/MyProjectsScreen")}
+            >
               <Text className="text-[#0461A6]">View all</Text>
             </TouchableOpacity>
           </View>

@@ -1,13 +1,16 @@
 import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Ai from "../../assets/Icon/Ai.svg";
+import Back from "../../assets/images/back.svg";
 import Scandinavian from "../../assets/images/Scandinavian.png";
 import Button from "../../components/ui/Button";
+import Header from "../../components/ui/Header";
 import { Text12, Text16Bold } from "../../components/ui/Typography";
 const RecommendedStyles = () => {
   const [selectedId, setSelectedId] = useState(null);
-
+  const router = useRouter();
   const styles = [
     {
       id: 1,
@@ -45,7 +48,16 @@ const RecommendedStyles = () => {
 
   return (
     <View className="flex-1 ">
-      {/* Header */}
+      <View className="mt-6">
+        <Header
+          left={<Back />}
+          onLeftPress={() => router.back()}
+          title="Suggested a style"
+          right={""}
+          onRightPress={() => setIsModalVisible(true)}
+          rightWidth={60}
+        />
+      </View>
       <Text16Bold>AI Style Recommendations</Text16Bold>
       <Text12>Our AI has analyzed your room and suggests these styles</Text12>
 
@@ -125,7 +137,7 @@ const RecommendedStyles = () => {
         <View className="flex-1 ml-2">
           <Button
             variant="primary"
-            onPress={() => console.log("Continue with:", selectedId)}
+            onPress={() => router.push("Pages/SelectColorsScreen")}
           >
             Continue to color
           </Button>

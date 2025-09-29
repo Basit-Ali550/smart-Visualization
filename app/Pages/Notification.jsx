@@ -5,7 +5,7 @@ import { Text14, Text16, Text16Bold } from "../../components/ui/Typography";
 
 const NotificationList = () => {
   return (
-    <View className="flex-1 ">
+    <View className="flex-1 mt-14">
       {/* First Section */}
       <Text16Bold>Today</Text16Bold>
       <View className="mt-3">
