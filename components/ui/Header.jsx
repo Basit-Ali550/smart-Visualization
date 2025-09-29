@@ -1,6 +1,13 @@
 import { Text, TouchableOpacity, View } from "react-native";
 
-const Header = ({ left, onLeftPress, title, right, rightWidth = 48 }) => {
+const Header = ({
+  left,
+  onLeftPress,
+  onRightPress,
+  title,
+  right,
+  rightWidth = 48,
+}) => {
   return (
     <View className="flex-row justify-between items-center mb-6">
       {/* Left */}
@@ -16,7 +23,17 @@ const Header = ({ left, onLeftPress, title, right, rightWidth = 48 }) => {
       {title && <Text className="text-[24px] font-bold">{title}</Text>}
 
       {/* Right (or placeholder with custom width) */}
-      {right ? <View>{right}</View> : <View style={{ width: rightWidth }} />}
+      {right ? (
+        onRightPress ? (
+          <TouchableOpacity onPress={onRightPress} className="ml-4">
+            {right}
+          </TouchableOpacity>
+        ) : (
+          <View>{right}</View>
+        )
+      ) : (
+        <View style={{ width: rightWidth }} />
+      )}
     </View>
   );
 };

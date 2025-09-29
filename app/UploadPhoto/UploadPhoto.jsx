@@ -143,52 +143,53 @@ const UploadPhotoScreen = () => {
       onRequestClose={() => setShowConfirmation(false)}
     >
       <View className="flex-1 bg-black/50 justify-center items-center px-6">
-        <View className="bg-white rounded-2xl w-full max-w-md overflow-hidden">
+        <View className="bg-white p-4 rounded-2xl w-full max-w-md overflow-hidden">
           {/* Modal Header */}
-          <View className="px-6 pt-6 pb-4">
-            <View className="flex-row items-center justify-between mb-4">
-              <Text16Bold className="font-bold">Confirm Your Photo</Text16Bold>
-              <TouchableOpacity onPress={() => setShowConfirmation(false)}>
-                <Feather name="x" size={24} color="#000000" />
-              </TouchableOpacity>
-            </View>
-
-            <Text14 className="text-[#767C8C] text-center mb-4">
-              Is this the photo you want to use for visualization?
-            </Text14>
+          <View className="flex-row justify-end ">
+          <TouchableOpacity className="w-8" onPress={() => setShowConfirmation(false)}>
+            <Feather name="x" size={24} color="#000000" />
+          </TouchableOpacity>
+          </View>
+          <View className=" mb-5">
+            <Text16Bold className="font-bold text-center">Confirm Your Photo</Text16Bold>
           </View>
 
           {/* Selected Photo Preview */}
           {selectedImage && (
-            <View className="px-6 pb-4">
+            <View>
               <Image
                 source={{ uri: selectedImage.uri }}
-                className="w-full h-64 rounded-xl"
+                className="w-full h-[130px] rounded-xl"
                 resizeMode="cover"
               />
-              <Text14 className="text-center mt-2 text-[#767C8C]">
-                Gallery
+              <Text14 className="mt-4 mb-5 text-[#767C8C]">
+                Is this the photo you want to use for visualization?
               </Text14>
             </View>
           )}
 
           {/* Modal Actions */}
-          <View className="px-6 pb-6">
-            <Button
+          <View className="flex-row gap-4">
+            
+            <View className="flex-1">
+              <Button
+              variant="beta"
+              className="w-full"
+              onPress={handleUsePhoto}
+            >
+              Gallery
+            </Button>
+            </View>
+            <View className="flex-1">
+              <Button
               variant="primary"
-              className="w-full mb-3"
+              className="w-full"
               onPress={handleUsePhoto}
             >
               Use this photo
             </Button>
-            <TouchableOpacity
-              onPress={() => setShowConfirmation(false)}
-              className="py-3 rounded-xl border border-gray-300 items-center"
-            >
-              <Text14 className="text-[#0461A6] font-semibold">
-                Choose different photo
-              </Text14>
-            </TouchableOpacity>
+            </View>
+            
           </View>
         </View>
       </View>
