@@ -1,18 +1,13 @@
 import { Feather } from "@expo/vector-icons";
 import { Formik } from "formik";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import * as yup from "yup";
 
 // Your components
-import Button from "../../../components/ui/Button";
-import InputField from "../../../components/ui/InputFeild";
-import { Text14, Text20 } from "../../../components/ui/Typography";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Button from "../../components/ui/Button";
+import InputField from "../../components/ui/InputFeild";
+import { Text14, Text20 } from "../../components/ui/Typography";
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const forgotPasswordValidationSchema = yup.object().shape({
@@ -29,7 +24,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 ">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -39,11 +34,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
         >
           {/* Header Section */}
-          <View className="px-6 pt-10 pb-6">
-            <View className="items-center mb-8">
-              <Text20 className="text-[28px] mb-2">unitec</Text20>
-            </View>
-
+          <View className=" pt-10 pb-6">
             {/* Back Button */}
             <View className="mb-6">
               <Feather
@@ -56,7 +47,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
             {/* Title and Description */}
             <View className="mb-8">
-              <Text20 className="text-[24px] mb-2 font-bold">
+              <Text20 className="text-[20px] mb-2 font-bold">
                 Forgot Password
               </Text20>
               <Text14 className="text-[#767C8C] leading-6">
@@ -66,7 +57,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
           </View>
 
           {/* Form Section */}
-          <View className="flex-1 px-6">
+          <View className="flex--1">
             <Formik
               initialValues={{ email: "" }}
               validationSchema={forgotPasswordValidationSchema}
@@ -83,7 +74,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
                     leftIcon={Feather}
                     leftIconName="mail"
                     required={true}
-                    className="mb-8"
+                    className="mb-10"
                   />
 
                   {/* Continue Button */}
@@ -97,11 +88,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
                   </Button>
 
                   {/* Additional Help Text */}
-                  <View className="mt-6">
-                    <Text14 className="text-center text-[#767C8C]">
-                      We'll send a password reset link to your email address
-                    </Text14>
-                  </View>
                 </View>
               )}
             </Formik>

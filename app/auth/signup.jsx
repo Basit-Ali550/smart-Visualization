@@ -4,7 +4,6 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -13,12 +12,13 @@ import {
 import * as yup from "yup";
 
 // Your components
-import Logo from "../../../assets/Icon/Logo.svg";
-import Button from "../../../components/ui/Button";
-import InputField from "../../../components/ui/InputFeild";
-import { Text14, Text16, Text20 } from "../../../components/ui/Typography";
-const FaceBook = require("../../../assets/images/Facebook.png");
-const Google = require("../../../assets/images/Google.png");
+import { SafeAreaView } from "react-native-safe-area-context";
+import Logo from "../../assets/Icon/Logo.svg";
+import Button from "../../components/ui/Button";
+import InputField from "../../components/ui/InputFeild";
+import { Text14, Text16, Text20 } from "../../components/ui/Typography";
+const FaceBook = require("../../assets/images/Facebook.png");
+const Google = require("../../assets/images/Google.png");
 const SignUpScreen = ({ navigation }) => {
   const signUpValidationSchema = yup.object().shape({
     firstName: yup.string().required("First name is required"),

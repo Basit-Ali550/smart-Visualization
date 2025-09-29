@@ -10,16 +10,16 @@ import {
   View,
 } from "react-native";
 import * as yup from "yup";
-import Logo from "../../../assets/Icon/Logo.svg";
+import Logo from "../../assets/Icon/Logo.svg";
 // Your components
 import { SafeAreaView } from "react-native-safe-area-context";
-import Button from "../../../components/ui/Button";
-import InputField from "../../../components/ui/InputFeild";
-import { Text14, Text16, Text20 } from "../../../components/ui/Typography";
+import Button from "../../components/ui/Button";
+import InputField from "../../components/ui/InputFeild";
+import { Text14, Text16, Text20 } from "../../components/ui/Typography";
 
 // Import PNG images
-const FaceBook = require("../../../assets/images/Facebook.png");
-const Google = require("../../../assets/images/Google.png");
+const FaceBook = require("../../assets/images/Facebook.png");
+const Google = require("../../assets/images/Google.png");
 const LoginScreen = () => {
   const loginValidationSchema = yup.object().shape({
     email: yup
