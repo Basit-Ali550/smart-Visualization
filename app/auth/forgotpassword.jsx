@@ -1,6 +1,12 @@
 import { Feather } from "@expo/vector-icons";
 import { Formik } from "formik";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  View,
+} from "react-native";
 import * as yup from "yup";
 
 // Your components
@@ -9,9 +15,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../../components/ui/Button";
 import InputField from "../../components/ui/InputFeild";
 import { Text14, Text20 } from "../../components/ui/Typography";
+import usePost from "../../hooks/usePost"; // Import your usePost hook
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
+  const { postData, loading, error } = usePost("/api/v1/auth/password/reset");
+
   const forgotPasswordValidationSchema = yup.object().shape({
     email: yup
       .string()
@@ -19,10 +28,36 @@ const ForgotPasswordScreen = () => {
       .required("Email is required"),
   });
 
-  const handleContinue = (values) => {
-    navigation.navigate("auth/otpscreen");
-    // Handle forgot password logic here
-    // Typically you would send a reset password email
+  const handleContinue = async (values) => {
+    const payload = {
+      email: values.email,
+    };
+
+    try {
+      const result = await postData(payload);
+
+      if (result.success) {
+        console.log("Password reset email sent:", result.data);
+
+        // Navigate to OTP screen with email parameter
+        navigation.navigate("otpscreen", {
+          email: values.email,
+          fromForgotPassword: true,
+        });
+
+        // Optional: Show success message
+        Alert.alert(
+          "Success",
+          "Password reset instructions have been sent to your email."
+        );
+      } else {
+        console.error("Password reset error:", result.error);
+        Alert.alert("Error", result.error || "Failed to send reset email");
+      }
+    } catch (err) {
+      console.error("Password reset failed:", err);
+      Alert.alert("Error", "Failed to send reset email. Please try again.");
+    }
   };
 
   return (
@@ -78,15 +113,14 @@ const ForgotPasswordScreen = () => {
                     required={true}
                     className="mb-10"
                   />
-
                   {/* Continue Button */}
                   <Button
                     variant="primary"
                     className="w-full"
                     onPress={handleSubmit}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || loading}
                   >
-                    Continue
+                    {loading ? "Sending..." : "Continue"}
                   </Button>
 
                   {/* Additional Help Text */}

@@ -30,8 +30,6 @@ const NewPasswordScreen = () => {
 
   const handleResetPassword = (values) => {
     navigation.navigate("auth/login");
-    // Handle password reset logic here
-    // Typically you would update the password via API
   };
 
   return (
@@ -44,9 +42,7 @@ const NewPasswordScreen = () => {
           contentContainerStyle={{ flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
         >
-          {/* Header Section */}
           <View className=" pt-8 pb-6">
-            {/* Back Button */}
             <View className="mb-6">
               <Feather
                 name="arrow-left"
@@ -76,7 +72,6 @@ const NewPasswordScreen = () => {
             >
               {({ handleSubmit, isSubmitting }) => (
                 <View className="flex-1">
-                  {/* Password Input */}
                   <InputField
                     label="Password"
                     name="password"
@@ -87,8 +82,6 @@ const NewPasswordScreen = () => {
                     required={true}
                     className="mb-6"
                   />
-
-                  {/* Confirm Password Input */}
                   <InputField
                     label="Confirm Password"
                     name="confirmPassword"
@@ -99,10 +92,6 @@ const NewPasswordScreen = () => {
                     required={true}
                     className="mb-8"
                   />
-
-                  {/* Password Requirements */}
-
-                  {/* Reset Password Button */}
                   <Button
                     variant="primary"
                     className="w-full"

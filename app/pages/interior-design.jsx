@@ -2,7 +2,6 @@ import { Feather } from "@expo/vector-icons"; // Import Expo icon
 import { useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Back from "../../assets/images/back.svg";
-
 // Import images using require
 const Frame = require("../../assets/images/Frame.png");
 const Frame1 = require("../../assets/images/Frame (1).png");
@@ -73,7 +72,7 @@ const roomTypes = [
   },
 ];
 
-const InteriorDesignScreen = () => {
+const ExteriorDesigncreen = () => {
   const navigation = useNavigation();
   const [selectedRoom, setSelectedRoom] = useState(null);
   const router = useRouter();
@@ -128,20 +127,21 @@ const InteriorDesignScreen = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 ">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+        {/* Header Section */}
         <Header
           left={<Back />}
           onLeftPress={() => router.back()}
-          title="Save & Export Design"
+          title=""
           right={""}
           onRightPress={() => setIsModalVisible(true)}
           rightWidth={60}
         />
-        <View className=" pb-4">
-          <View className="flex-row items-center ">
+        <View className="pb-4">
+          <View className="flex-row items-center mb-4">
             <View className="flex-1">
-              <Text20 className="">Exterior Design</Text20>
+              <Text20 className="">Interior Design</Text20>
               <Text14 className="">
                 Transform your indoor spaces with our design tools.
               </Text14>
@@ -178,4 +178,4 @@ const InteriorDesignScreen = () => {
   );
 };
 
-export default InteriorDesignScreen;
+export default ExteriorDesigncreen;

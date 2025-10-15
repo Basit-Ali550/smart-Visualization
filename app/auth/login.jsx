@@ -1,8 +1,8 @@
 import { Feather } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native"; // Import useNavigation hook
+import { useRouter } from "expo-router";
 import { Formik } from "formik";
 import {
-  Image,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -16,13 +16,16 @@ import Logo from "../../assets/Icon/Logo.svg";
 import Button from "../../components/ui/Button";
 import InputField from "../../components/ui/InputFeild";
 import { Text14, Text16, Text20 } from "../../components/ui/Typography";
+import { useAuth } from "../../context/AuthContext";
+import usePost from "../../hooks/usePost";
 
-// Import PNG images
 const FaceBook = require("../../assets/images/Facebook.png");
 const Google = require("../../assets/images/Google.png");
 
 const LoginScreen = () => {
-  const navigation = useNavigation(); // Initialize navigation hook
+  const router = useRouter();
+  const { postData, loading: apiLoading, error } = usePost("api/v1/auth/login");
+  const { login } = useAuth();
 
   const loginValidationSchema = yup.object().shape({
     email: yup
@@ -35,10 +38,33 @@ const LoginScreen = () => {
       .required("Password is required"),
   });
 
-  const handleLogin = (values) => {
-    console.log("Login values:", values);
-    navigation.navigate("Pages/Home");
-    // Handle login logic here
+  const handleLogin = async (values) => {
+    try {
+      const payload = {
+        email: values.email,
+        password: values.password,
+      };
+
+      const result = await postData(payload);
+
+      if (result.success) {
+        const loginSuccess = await login(
+          result.data.tokens.access_token,
+          result.data.user
+        );
+
+        if (loginSuccess) {
+          router.replace("/pages/home");
+        } else {
+          Alert.alert("Error", "Failed to save login data");
+        }
+      } else {
+        Alert.alert("Login Failed", result.error || "Invalid credentials");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -51,7 +77,6 @@ const LoginScreen = () => {
           contentContainerStyle={{ flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
         >
-          {/* Header Section */}
           <View className="pt-4">
             <View className="flex-row justify-center mb-6">
               <Logo />
@@ -62,14 +87,13 @@ const LoginScreen = () => {
             </Text16>
           </View>
 
-          {/* Login Form */}
           <View className="flex-1 pt-8">
             <Formik
               initialValues={{ email: "", password: "", rememberMe: false }}
               validationSchema={loginValidationSchema}
               onSubmit={handleLogin}
             >
-              {({ handleSubmit, values, setFieldValue, isSubmitting }) => (
+              {({ handleSubmit, values, setFieldValue }) => (
                 <View className="flex-1">
                   {/* Email Input */}
                   <InputField
@@ -118,7 +142,7 @@ const LoginScreen = () => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      onPress={() => navigation.navigate("auth/forgotpassword")}
+                      onPress={() => router.push("/auth/forgotpassword")}
                     >
                       <Text className="text-[#0461A6] text-sm font-normal">
                         Forgot password?
@@ -131,35 +155,17 @@ const LoginScreen = () => {
                     variant="primary"
                     className="w-full mb-6"
                     onPress={handleSubmit}
-                    disabled={isSubmitting}
+                    disabled={apiLoading}
                   >
-                    Log in
+                    {apiLoading ? "Logging in..." : "Log in"}
                   </Button>
 
-                  {/* Divider */}
-                  <View className="flex-row items-center mb-6">
-                    <View className="flex-1 h-px bg-[#E5E5E5]" />
-                    <Text14 className="mx-4 text-[#A8AEBF]">or</Text14>
-                    <View className="flex-1 h-px bg-[#E5E5E5]" />
-                  </View>
-
-                  {/* Social Login Buttons */}
-                  <View className="flex-row gap-4 justify-center space-x-4 mb-8">
-                    <TouchableOpacity className="w-16 h-16 bg-white rounded-full items-center justify-center">
-                      <Image
-                        source={FaceBook}
-                        style={{ width: 24, height: 24 }}
-                        resizeMode="contain"
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity className="w-16 h-16 bg-white rounded-full items-center justify-center">
-                      <Image
-                        source={Google}
-                        style={{ width: 24, height: 24 }}
-                        resizeMode="contain"
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  {/* Error Message */}
+                  {error && (
+                    <Text className="text-red-500 text-center mb-4">
+                      {error}
+                    </Text>
+                  )}
 
                   {/* Sign Up Link */}
                   <View className="flex-row justify-center items-center">
@@ -167,7 +173,7 @@ const LoginScreen = () => {
                       Don't have an account?{" "}
                     </Text>
                     <TouchableOpacity
-                      onPress={() => navigation.navigate("auth/signup")} // Navigate to SignUp screen
+                      onPress={() => router.push("/auth/signup")}
                     >
                       <Text className="text-[#0461A6] text-sm font-semibold">
                         Sign up
