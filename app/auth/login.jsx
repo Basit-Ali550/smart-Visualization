@@ -1,3 +1,4 @@
+// app/auth/login.jsx
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Formik } from "formik";
@@ -37,7 +38,7 @@ const LoginScreen = () => {
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
   });
-
+  // app/auth/login.jsx - Update the handleLogin function
   const handleLogin = async (values) => {
     try {
       const payload = {
@@ -54,7 +55,27 @@ const LoginScreen = () => {
         );
 
         if (loginSuccess) {
-          router.replace("/pages/home");
+          // Check if user needs face verification based on avatar_url
+          const needsFaceVerification = !result.data.user.avatar_url;
+
+          console.log("Avatar URL:", result.data.user.avatar_url);
+          console.log("Needs face verification:", needsFaceVerification);
+
+          if (needsFaceVerification) {
+            // Navigate to face verification with user data
+            router.replace({
+              pathname: "auth/face-verification",
+              params: {
+                firstName: result.data.user.first_name,
+                lastName: result.data.user.last_name,
+                email: result.data.user.email,
+                userId: result.data.user.id,
+              },
+            });
+          } else {
+            // Navigate directly to home for users with avatar
+            router.replace("/pages/home");
+          }
         } else {
           Alert.alert("Error", "Failed to save login data");
         }

@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
 
   const checkExistingAuth = async () => {
     try {
-      // Use SecureStore for better security
       const savedToken = await SecureStore.getItemAsync('authToken');
       const savedUser = await SecureStore.getItemAsync('userData');
       
@@ -34,7 +33,6 @@ export const AuthProvider = ({ children }) => {
       setToken(authToken);
       setUser(userData);
 
-      // Save to SecureStore
       await SecureStore.setItemAsync('authToken', authToken);
       await SecureStore.setItemAsync('userData', JSON.stringify(userData));
       
@@ -50,11 +48,31 @@ export const AuthProvider = ({ children }) => {
       setToken(null);
       setUser(null);
       
-      // Remove from SecureStore
       await SecureStore.deleteItemAsync('authToken');
       await SecureStore.deleteItemAsync('userData');
     } catch (error) {
       console.error('Logout error:', error);
+    }
+  };
+
+  // Update user avatar after face verification
+  const updateUserAvatar = async (avatarUrl) => {
+    try {
+      if (user) {
+        const updatedUser = {
+          ...user,
+          avatar_url: avatarUrl,
+          updated_at: new Date().toISOString()
+        };
+        
+        setUser(updatedUser);
+        await SecureStore.setItemAsync('userData', JSON.stringify(updatedUser));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      return false;
     }
   };
 
@@ -65,6 +83,9 @@ export const AuthProvider = ({ children }) => {
     logout,
     loading,
     isAuthenticated: !!token,
+    // Add avatar check properties
+    hasAvatar: !!user?.avatar_url,
+    updateUserAvatar,
   };
 
   return (
