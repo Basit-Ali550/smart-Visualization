@@ -86,7 +86,7 @@ const VerifyEmailScreen = () => {
         Alert.alert("Success", "Email verified successfully!");
 
         // Navigate to login page after successful verification
-        navigation.navigate("auth/login");
+        navigation.navigate("login");
       } else {
         Alert.alert("Error", result.error || "Invalid OTP code");
       }

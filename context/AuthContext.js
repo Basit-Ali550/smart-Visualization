@@ -20,9 +20,15 @@ export const AuthProvider = ({ children }) => {
       if (savedToken && savedUser) {
         setToken(savedToken);
         setUser(JSON.parse(savedUser));
+      } else {
+        // Clear any invalid tokens
+        setToken(null);
+        setUser(null);
       }
     } catch (error) {
       console.error('Error checking auth:', error);
+      setToken(null);
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -55,13 +61,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Update user avatar after face verification
-  const updateUserAvatar = async (avatarUrl) => {
+  // Update user data after profile update
+  const updateUserData = async (updatedData) => {
     try {
       if (user) {
         const updatedUser = {
           ...user,
-          avatar_url: avatarUrl,
+          ...updatedData,
           updated_at: new Date().toISOString()
         };
         
@@ -71,9 +77,14 @@ export const AuthProvider = ({ children }) => {
       }
       return false;
     } catch (error) {
-      console.error('Error updating avatar:', error);
+      console.error('Error updating user data:', error);
       return false;
     }
+  };
+
+  // Update user avatar after face verification
+  const updateUserAvatar = async (avatarUrl) => {
+    return updateUserData({ avatar_url: avatarUrl });
   };
 
   const value = {
@@ -86,6 +97,9 @@ export const AuthProvider = ({ children }) => {
     // Add avatar check properties
     hasAvatar: !!user?.avatar_url,
     updateUserAvatar,
+    updateUserData,
+    // Add token check method
+    getValidToken: () => token,
   };
 
   return (

@@ -1,17 +1,29 @@
 import { Feather } from "@expo/vector-icons";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Formik } from "formik";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
-import * as yup from "yup";
-
-// Your components
-import { useNavigation } from "@react-navigation/native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as yup from "yup";
 import Button from "../../components/ui/Button";
 import InputField from "../../components/ui/InputFeild";
 import { Text14, Text20 } from "../../components/ui/Typography";
+import usePost from "../../hooks/usePost";
 
 const NewPasswordScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { email, otp_code } = route.params || {};
+
+  // API hook for password reset confirmation
+  const { postData: resetPassword, loading: resetLoading } = usePost(
+    "/api/v1/auth/password/reset/confirm"
+  );
 
   const newPasswordValidationSchema = yup.object().shape({
     password: yup
@@ -28,8 +40,33 @@ const NewPasswordScreen = () => {
       .required("Please confirm your password"),
   });
 
-  const handleResetPassword = (values) => {
-    navigation.navigate("auth/login");
+  const handleResetPassword = async (values) => {
+    if (!email || !otp_code) {
+      Alert.alert("Error", "Missing email or OTP code");
+      return;
+    }
+
+    const payload = {
+      email: email,
+      otp_code: otp_code,
+      password: values.password,
+      password_confirm: values.confirmPassword,
+      logout_all_devices: false,
+    };
+
+    try {
+      const result = await resetPassword(payload);
+
+      if (result.success) {
+        Alert.alert("Success", "Password reset successfully!");
+        navigation.navigate("login");
+      } else {
+        Alert.alert("Error", result.error || "Failed to reset password");
+      }
+    } catch (err) {
+      console.error("Password reset failed:", err);
+      Alert.alert("Error", "Failed to reset password. Please try again.");
+    }
   };
 
   return (
@@ -96,9 +133,9 @@ const NewPasswordScreen = () => {
                     variant="primary"
                     className="w-full"
                     onPress={handleSubmit}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || resetLoading}
                   >
-                    Reset Password
+                    {resetLoading ? "Resetting..." : "Reset Password"}
                   </Button>
                 </View>
               )}

@@ -254,7 +254,7 @@ const OtpVerificationScreen = () => {
         Alert.alert("Success", "OTP verified successfully!");
 
         // Navigate to new password screen
-        navigation.navigate("auth/newpassword", {
+        navigation.navigate("newpassword", {
           email: email,
           otp_code: otpCode,
         });

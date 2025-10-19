@@ -52,7 +52,7 @@ const DashboardScreen = () => {
   // Render recent project item
   const renderProjectItem = ({ item }) => (
     <TouchableOpacity
-      onPress={() => router.push("/pages/profile")} // ✅ Expo Router syntax
+      onPress={() => router.push("/pages/profile")}
       className="p-3 bg-white flex-1 m-2 rounded-xl"
     >
       <View className="relative">
@@ -253,13 +253,13 @@ const DashboardScreen = () => {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1">
       <FlatList
         data={sections}
         renderItem={renderSection}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
+        // contentContainerStyle={{ paddingVertical: 8 }}
       />
     </SafeAreaView>
   );
