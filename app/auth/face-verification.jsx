@@ -8,19 +8,13 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Defs, Ellipse, Mask, Rect } from "react-native-svg";
 import Face from "../../assets/images/Face.svg";
 import Button from "../../components/ui/Button";
-import {
-  Text16,
-  Text16Bold,
-  Text20,
-  Text24,
-} from "../../components/ui/Typography";
+import { Text16, Text16Bold, Text24 } from "../../components/ui/Typography";
 import { useAuth } from "../../context/AuthContext";
 
 const FaceVerificationScreen = () => {
@@ -65,13 +59,9 @@ const FaceVerificationScreen = () => {
           skipProcessing: false,
           exif: false,
         });
-
-        console.log("📸 Photo captured");
         setVerificationStatus("processing");
         await updateProfileWithAvatar(photo.uri);
       } catch (error) {
-        console.error("❌ Camera error:", error);
-        Alert.alert("Error", "Failed to capture image.");
         resetVerification();
       }
     }
@@ -80,7 +70,6 @@ const FaceVerificationScreen = () => {
   const updateProfileWithAvatar = async (imageUri) => {
     try {
       setUploadLoading(true);
-      console.log("🔄 Starting DIRECT PATCH API call...");
 
       // ✅ Get token directly from SecureStore
       const authToken = await SecureStore.getItemAsync("authToken");
@@ -89,25 +78,17 @@ const FaceVerificationScreen = () => {
         throw new Error("No authentication token found");
       }
 
-      console.log(
-        "🔐 Token retrieved:",
-        authToken ? "✅ Present" : "❌ Missing"
-      );
-
       // ✅ Create FormData
       const formData = new FormData();
 
       // Append text fields
       if (firstName) {
         formData.append("first_name", firstName);
-        console.log("✅ first_name:", firstName);
       }
       if (lastName) {
         formData.append("last_name", lastName);
-        console.log("✅ last_name:", lastName);
       }
 
-      // Append file field
       if (imageUri) {
         formData.append("avatar", {
           uri: imageUri,
@@ -117,24 +98,16 @@ const FaceVerificationScreen = () => {
         console.log("✅ avatar file appended");
       }
 
-      // ✅ DIRECT API CALL with fetch
-      console.log("🚀 Making DIRECT PATCH request...");
-      console.log("🌐 URL: https://api.unitec.run.place/api/v1/users/profile");
-
       const response = await fetch(
         "https://api.unitec.run.place/api/v1/users/profile",
         {
           method: "PATCH",
           headers: {
             Authorization: `Bearer ${authToken}`,
-            // ❌ DON'T set Content-Type for FormData - let browser set it automatically
           },
           body: formData,
         }
       );
-
-      console.log("📡 Response Status:", response.status);
-      console.log("📡 Response OK:", response.ok);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -143,8 +116,6 @@ const FaceVerificationScreen = () => {
       }
 
       const result = await response.json();
-      console.log("✅ DIRECT PATCH SUCCESS!");
-      console.log("📊 Response Data:", result);
 
       // Update user data
       if (updateUserData && result) {
@@ -154,7 +125,6 @@ const FaceVerificationScreen = () => {
           last_name: result.last_name,
           avatar_url: result.avatar_url,
         });
-        console.log("✅ User data updated in context");
       }
 
       setVerificationStatus("success");
@@ -220,14 +190,13 @@ const FaceVerificationScreen = () => {
         </View>
       ) : verificationStatus === "processing" ? (
         <View className="flex-1 justify-center items-center px-6">
-          <ActivityIndicator size="large" />
-          <Text20 className="mt-4">
-            {uploadLoading ? "Uploading..." : "Processing..."}
-          </Text20>
-          <Text16 className="text-gray-500 mt-2 text-center">
-            Direct API call with multipart/form-data{"\n"}
-            Token: {token ? "✅ Present" : "❌ Missing"}
-          </Text16>
+          <ActivityIndicator size="large" className="w-[200px] h-[200px]" />
+          <Text className="text-[#1B212D] font-bold text-[24px] mt-2 text-center">
+            When are processing your data
+          </Text>
+          <Text className="text-[#767C8C] text-base font-medium mt-4 text-center">
+            Your verification status will appear here
+          </Text>
         </View>
       ) : verificationStatus === "success" ? (
         <View className="flex-1 justify-center items-center px-6">
@@ -251,7 +220,7 @@ const FaceVerificationScreen = () => {
             <Defs>
               <Mask id="mask">
                 <Rect width="100%" height="100%" fill="white" />
-                <Ellipse cx="50%" cy="40%" rx="120" ry="160" fill="black" />
+                <Ellipse cx="50%" cy="40%" rx="150" ry="200" fill="black" />
               </Mask>
             </Defs>
             <Rect
@@ -262,30 +231,25 @@ const FaceVerificationScreen = () => {
             />
           </Svg>
 
-          <View className="absolute top-32 left-0 right-0 items-center px-4">
-            <Text className="text-white text-lg font-bold text-center mb-2">
-              Position your face in the oval
-            </Text>
-            <Text className="text-white text-sm text-center">
-              We'll upload directly to API
-            </Text>
-          </View>
-
           <View className="absolute bottom-12 w-full items-center">
-            <TouchableOpacity
+            <Button
+              variant="primary"
+              className="w-96 mb-6"
               onPress={takePicture}
               disabled={uploadLoading}
-              className={`${uploadLoading ? "opacity-50" : "opacity-100"}`}
             >
-              <View className="w-20 h-20 bg-white rounded-full border-4 border-blue-500 items-center justify-center">
-                <View className="w-16 h-16 bg-blue-500 rounded-full" />
-              </View>
-            </TouchableOpacity>
+              {uploadLoading ? "Processing..." : "Start verification"}
+            </Button>
             {uploadLoading && (
-              <Text className="text-white mt-4 text-center">
-                Direct API upload...{"\n"}
-                Please wait
-              </Text>
+              <>
+                <ActivityIndicator size="large" color="#1B212D" />
+                <Text className="text-[#1B212D] font-bold text-[24px] mt-2 text-center">
+                  When are processing your data
+                </Text>
+                <Text className="text-[#767C8C] text-base font-medium mt-4 text-center">
+                  Your verification status will appear here
+                </Text>
+              </>
             )}
           </View>
         </View>

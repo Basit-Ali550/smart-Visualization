@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Formik } from "formik";
+import { useState } from "react";
 import {
   Image,
   Keyboard,
@@ -26,6 +27,7 @@ const Google = require("../../assets/images/Google.png");
 const SignUpScreen = () => {
   const navigation = useNavigation();
   const { postData, loading, error } = usePost("api/v1/auth/register");
+  const [errorMessage, setErrorMessage] = useState(null); // State for error message
 
   const signUpValidationSchema = yup.object().shape({
     firstName: yup.string().required("First name is required"),
@@ -36,7 +38,14 @@ const SignUpScreen = () => {
       .required("Email is required"),
     password: yup
       .string()
-      .min(6, "Password must be at least 6 characters")
+      .min(8, "Password must be at least 8 characters")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+      .matches(/[0-9]/, "Password must contain at least one number")
+      .matches(
+        /[!@#$%^&*(),.?":{}|<>]/,
+        "Password must contain at least one special character"
+      )
       .required("Password is required"),
     passwordConfirm: yup
       .string()
@@ -45,6 +54,7 @@ const SignUpScreen = () => {
   });
 
   const handleSignUp = async (values) => {
+    setErrorMessage(null); // Reset error message
     const payload = {
       email: values.email,
       first_name: values.firstName,
@@ -60,9 +70,10 @@ const SignUpScreen = () => {
           email: values.email,
         });
       } else {
-        console.error("Sign up error:", result.error);
+        setErrorMessage(result.error); // Set error from API
       }
     } catch (err) {
+      setErrorMessage("An unexpected error occurred. Please try again.");
       console.error("Sign up failed:", err);
     }
   };
@@ -99,6 +110,12 @@ const SignUpScreen = () => {
                 Transform your spaces with confidence
               </Text16>
             </View>
+
+            {errorMessage && (
+              <View className="mb-4 ">
+                <Text className="text-red-500 text-center">{errorMessage}</Text>
+              </View>
+            )}
 
             {/* Sign Up Form */}
             <View className="flex-1 pt-4">
@@ -150,6 +167,8 @@ const SignUpScreen = () => {
                       required={true}
                       className="mb-4"
                     />
+
+                    {/* Password Input */}
                     <InputField
                       label="Password"
                       name="password"
@@ -160,6 +179,8 @@ const SignUpScreen = () => {
                       required={true}
                       className="mb-4"
                     />
+
+                    {/* Confirm Password Input */}
                     <InputField
                       label="Confirm Password"
                       name="passwordConfirm"
@@ -170,6 +191,8 @@ const SignUpScreen = () => {
                       required={true}
                       className="mb-6"
                     />
+
+                    {/* Submit Button */}
                     <Button
                       variant="primary"
                       className="w-full mb-6"
@@ -178,12 +201,16 @@ const SignUpScreen = () => {
                     >
                       {loading ? "Signing Up..." : "Sign Up"}
                     </Button>
+
+                    {/* Divider */}
                     <View className="flex-row items-center mb-6">
                       <View className="flex-1 h-px bg-[#E5E5E5]" />
                       <Text14 className="mx-4">or</Text14>
                       <View className="flex-1 h-px bg-[#E5E5E5]" />
                     </View>
-                    <View className="flex-row gap-4 justify-center space-x-4 mb-8">
+
+                    {/* Social Login Buttons */}
+                    <View className="flex-row gap-4 justify-center mb-8">
                       <TouchableOpacity className="w-16 h-16 bg-white rounded-full items-center justify-center border border-gray-200">
                         <Image
                           source={FaceBook}

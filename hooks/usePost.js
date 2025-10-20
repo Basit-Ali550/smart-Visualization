@@ -16,7 +16,11 @@ const usePost = (endpoint) => {
       setResponse(res.data);
       return { success: true, data: res.data };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || 'Something went wrong';
+      let errorMessage = err.response?.data?.detail || err.message || 'Something went wrong';
+      if (err.response?.status === 409) {
+        errorMessage = "This email is already registered and verified.";
+      }
+
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
