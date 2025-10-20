@@ -82,7 +82,7 @@ const DashboardScreen = () => {
   const renderStyleItem = ({ item }) => (
     <TouchableOpacity
       className="p-3 bg-white flex-1 m-2 rounded-xl"
-      onPress={() => router.push("/pages/style-details")}
+      // onPress={() => router.push("/pages/style-details")}
     >
       <View className="relative">
         <Image
@@ -125,7 +125,7 @@ const DashboardScreen = () => {
                 <EvilIcons name="search" size={24} color="black" />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => router.push("/pages/notifications")} // ✅ Expo Router
+                // onPress={() => router.push("/pages/notifications")} // ✅ Expo Router
                 className="w-10 h-10 rounded-full bg-white justify-center items-center"
               >
                 <Ionicons
@@ -167,7 +167,7 @@ const DashboardScreen = () => {
             </View>
           </View>
           <Button
-            onPress={() => router.push("/pages/interior-design")} // ✅ Expo Router
+            // onPress={() => router.push("/pages/interior-design")} // ✅ Expo Router
             variant="primary"
           >
             Start project
@@ -192,7 +192,7 @@ const DashboardScreen = () => {
             </View>
           </View>
           <Button
-            onPress={() => router.push("/pages/exterior-design")} // ✅ Expo Router
+            // onPress={() => router.push("/pages/exterior-design")} // ✅ Expo Router
             variant="primary"
           >
             Start project
@@ -204,7 +204,7 @@ const DashboardScreen = () => {
           <View className="flex-row justify-between items-center mb-4">
             <Text16Bold>Recent Projects</Text16Bold>
             <TouchableOpacity
-              onPress={() => router.push("/pages/my-projects")} // ✅ Expo Router
+            // onPress={() => router.push("/pages/my-projects")} // ✅ Expo Router
             >
               <Text className="text-[#0461A6]">View all</Text>
             </TouchableOpacity>
@@ -225,7 +225,7 @@ const DashboardScreen = () => {
           <View className="flex-row justify-between items-center mb-4">
             <Text16Bold>Popular Styles</Text16Bold>
             <TouchableOpacity
-              onPress={() => router.push("/pages/styles")} // ✅ Expo Router
+            // onPress={() => router.push("/pages/styles")} // ✅ Expo Router
             >
               <Text className="text-[#0461A6]">View all</Text>
             </TouchableOpacity>
