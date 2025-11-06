@@ -1,0 +1,47 @@
+[
+    {
+        "id":1,
+        "name": "Kitchen",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/room_types/1762411202_Kitchen.svg"
+    },
+    {
+        "id":2,
+        "name": "Tatami Room",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/room_types/1762411202_Tatami_Room.svg"
+    },
+    {
+        "id":3,
+        "name": "Bedroom",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/room_types/1762411203_Bedroom.svg"
+    },
+    {
+        "id":4,
+        "name": "Home Office",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/room_types/1762411203_Home_Office.svg"
+    },
+    {
+        "id":5,
+        "name": "Lounge",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/room_types/1762411203_Lounge.svg"
+    },
+    {
+        "id":6,
+        "name": "Dining Room",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/room_types/1762411204_Dining_Room.svg"
+    },
+    {
+        "id":7,
+        "name": "kids room",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/room_types/1762411204_kids_room.jpg"
+    },
+    {
+        "id":8,
+        "name": "Bathroom",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/room_types/1762411205_Bathroom.svg"
+    },
+    {
+        "id":9,
+        "name": "Living Room",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/room_types/1762411205_Living_Room.svg"
+    }
+]

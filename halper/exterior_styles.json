@@ -1,0 +1,118 @@
+[
+    {
+        "id":1,
+        "name": "Retreat",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411726_Retreat.jpg"
+    },
+    {
+          "id":2,
+        "name": "Christmas",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411727_Christmas.jpg"
+    },
+    {
+          "id":3,
+        "name": "Prairie",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411727_Prairie.jpg"
+    },
+    { 
+        "id":4,
+        "name": "International",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411728_International.jpg"
+    },
+    {
+        
+        "id":5,
+        "name": "Chalet",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411728_Chalet.jpg"
+    },
+    {
+           "id":6,
+        "name": "Craftsman",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411728_Craftsman.jpg"
+    },
+    {
+           "id":7,
+        "name": "Painted Brick",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411729_Painted_Brick.jpg"
+    },
+    {
+        "id":8,
+        "name": "Colonial",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411729_Colonial.jpg"
+    },
+    {
+        "id":9,
+        "name": "Contemporary",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411730_Contemporary.jpg"
+    },
+    {
+        "id":10,
+        "name": "Moody Colors",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411730_Moody_Colors.jpg"
+    },
+    {
+        "id":11,
+        "name": "Wood Accents",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411731_Wood_Accents.jpg"
+    },
+    {
+        "id":12,
+        "name": "Mediterranean",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411731_Mediterranean.jpg"
+    },
+    {
+        "id":13,
+        "name": "Modern Blend",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411731_Modern_Blend.jpg"
+    },
+    {
+        "id":14,
+        "name": "Green",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411732_Green.jpg"
+    },
+    {
+        "id":15,
+        "name": "Red Brick",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411732_Red_Brick.jpg"
+    },
+    {
+        "id":16,
+        "name": "Elegant",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411733_Elegant.jpg"
+    },
+    {
+        "id":17,
+        "name": "Modern Farm House",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411733_Modern_Farm_House.jpg"
+    },
+    {
+        "id":18,
+        "name": "Industrial",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411734_Industrial.jpg"
+    },
+    {
+        "id":19,
+        "name": "Stone Clad",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411734_Stone_Clad.jpg"
+    },
+    {
+        "id":20,
+        "name": "Portuguese",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411735_Portuguese.jpg"
+    },
+    {
+        "id":21,
+        "name": "Glass House",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411735_Glass_House.jpg"
+    },
+    {
+        "id":22,
+        "name": "Traditional",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411735_Traditional.jpg"
+    },
+    {
+        "id":23,
+        "name": "Ranch",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/styles/1762411736_Ranch.jpg"
+    }
+]

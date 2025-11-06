@@ -1,0 +1,152 @@
+[
+    { 
+        "id":1,
+        "name": "Christmas",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411827_Christmas.jpg"
+    },
+    {
+        "id":2,
+        "name": "Cottage Core",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411828_Cottage_Core.jpg"
+    },
+    {
+        "id":3,
+        "name": "Futuristic",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411829_Futuristic.jpg"
+    },
+    {
+        "id":4,
+        "name": "Ikea",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411829_Ikea.jpg"
+    },
+    {
+        "id":5,
+        "name": "Bohemian",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411829_Bohemian.jpg"
+    },
+    {
+        "id":6,
+        "name": "Eclectic",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411830_Eclectic.jpg"
+    },
+    {
+        "id":7,
+        "name": "Transitional",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411834_Transitional.jpg"
+    },
+    {
+        "id":8,
+        "name": "Rustic",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411834_Rustic.jpg"
+    },
+    {
+        "id":9,
+        "name": "Contemporary",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411834_Contemporary.jpg"
+    },
+    {
+        "id":10,
+        "name": "French Country",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411835_French_Country.jpg"
+    },
+    {
+        "id":11,
+        "name": "Kids",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411835_Kids_.jpg"
+    },
+    {
+        "id":12,
+        "name": "Japanese Design",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411835_Japanese_Design.jpg"
+    },
+    {
+        "id":13,
+        "name": "Art Deco",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411838_Art_Deco.jpg"
+    },
+    {
+        "id":14,
+        "name": "Biedermeier",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411839_Biedermeier.jpg"
+    },
+    {
+        "id":15,
+        "name": "Mediterranean",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411839_Mediterranean.jpg"
+    },
+    {
+        "id":16,
+        "name": "American",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411841_American.jpg"
+    },
+    {
+        "id":17,
+        "name": "Biophilic",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411841_Biophilic.jpg"
+    },
+    {
+        "id":18,
+        "name": "Modern Farm House",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411842_Modern_Farm_House.jpg"
+    },
+    {
+        "id":19,
+        "name": "Art Nouveau",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411842_Art_Nouveau.jpg"
+    },
+    {
+        "id":20,
+        "name": "Hollywood Regency",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411843_Hollywood_Regency.jpg"
+    },
+    {
+        "id":21,
+        "name": "Coastal",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411843_Coastal.jpg"
+    },
+    {
+        "id":22,
+        "name": "Shabby Chic",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411843_Shabby_Chic.jpg"
+    },
+    {
+        "id":23,
+        "name": "Scandinavian",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411844_Scandinavian.jpg"
+    },
+    {
+        "id":24,
+        "name": "Arabicjpg",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411844_Arabicjpg.jpg"
+    },
+    {
+        "id":25,
+        "name": "Luxurious",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411845_Luxurious.jpg"
+    },
+    {
+        "id":26,
+        "name": "Asian Decor",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411845_Asian_Decor.jpg"
+    },
+    {
+        "id":27,
+        "name": "Zen",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411845_Zen.jpg"
+    },
+    {
+        "id":28,
+        "name": "Bauhaus",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411846_Bauhaus.jpg"
+    },
+    {
+        "id":29,
+        "name": "Deconstructivism",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411846_Deconstructivism.jpg"
+    },
+    {
+        "id":30,
+        "name": "South Western",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/interior/styles/1762411846_South_Western.jpg"
+    }
+]

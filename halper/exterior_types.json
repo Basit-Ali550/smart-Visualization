@@ -1,0 +1,42 @@
+[
+    {
+        "id":1,
+        "name": "Garage",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411358_Garage.jpg"
+    },
+    {
+        "id":2,
+        "name": "Deck & Patio",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411359_Deck_&_Patio.svg"
+    },
+    {
+        "id":3,
+        "name": "Balcony",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411360_Balcony.jpg"
+    },
+    {
+        "id":4,
+        "name": "Doors & Windows",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411360_Doors_&_Windows.svg"
+    },
+    {
+        "id":5,
+        "name": "Roof",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411361_Roof.svg"
+    },
+    {
+        "id":6,
+        "name": "Landscaping",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411361_Landscaping.svg"
+    },
+    {
+        "id":7,
+        "name": "House Facade",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411362_House_Facade.svg"
+    },
+    {
+        "id":8,
+        "name": "Siding",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411362_Siding.svg"
+    }
+]
