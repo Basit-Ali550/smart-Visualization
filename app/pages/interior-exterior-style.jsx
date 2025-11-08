@@ -33,7 +33,7 @@ const handleContinue = () => {
   if (!selectedStyle) return;
 
   router.push({
-    pathname: "/pages/project-details-form",
+    pathname: "/pages/upload-photo",
     params: {
       path,
       roomType: roomType || "",

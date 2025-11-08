@@ -7,7 +7,6 @@ const BASE_URL = "https://api.unitec.run.place";
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 30000,
 });
 
 // Request Interceptor
@@ -29,7 +28,6 @@ apiClient.interceptors.request.use(
         console.log('📁 Multipart/Form-Data detected:');
         console.log('🔹 Method:', config.method?.toUpperCase());
         
-        // ✅ CORRECT URL will be: https://api.unitec.run.place/api/v1/users/profile
         console.log('🔹 Final URL:', config.baseURL + '/' + config.url);
         
         console.log('🔹 FormData Parts:');
