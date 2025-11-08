@@ -6,6 +6,9 @@ export default function PagesLayout() {
       <Stack.Screen name="home" />
       <Stack.Screen name="exterior-design" />
       <Stack.Screen name="interior-design" />
+            <Stack.Screen name="interior-exterior-style" />
+      <Stack.Screen name="project-details-form" />
+
       <Stack.Screen name="settings" />
 
       {/* ✅ Add all the missing routes that you're trying to navigate to */}

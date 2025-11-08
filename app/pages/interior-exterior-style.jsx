@@ -29,19 +29,19 @@ const InteriorExteriorStyle = () => {
 
   const [selectedStyle, setSelectedStyle] = useState(null);
 
-  const handleContinue = () => {
-    if (!selectedStyle) return;
+const handleContinue = () => {
+  if (!selectedStyle) return;
 
-    router.push({
-      pathname: "/Pages/MaterialDetails",
-      params: {
-        from: path,
-        roomType: roomType || "",
-        elementName: elementName || "",
-        selectedStyle: JSON.stringify(selectedStyle),
-      },
-    });
-  };
+  router.push({
+    pathname: "/pages/project-details-form",
+    params: {
+      path,
+      roomType: roomType || "",
+      elementName: elementName || "",
+      selectedStyle: JSON.stringify(selectedStyle),
+    },
+  });
+};
 
   const StyleCard = ({ item }) => {
     const isSelected = selectedStyle?.name === item.name;
