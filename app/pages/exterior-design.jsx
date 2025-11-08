@@ -22,7 +22,7 @@ const ExteriorDesignScreen = () => {
 
   const handleContinue = () => {
     if (selectedRoom) {
-      router.push("pages/StyleSelection", { roomType: selectedRoom });
+      router.push("pages/interior-exterior-style", { roomType: selectedRoom });
     }
   };
 
