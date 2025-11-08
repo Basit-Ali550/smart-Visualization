@@ -167,7 +167,7 @@ const DashboardScreen = () => {
             </View>
           </View>
           <Button
-            // onPress={() => router.push("/pages/interior-design")} // ✅ Expo Router
+            onPress={() => router.push("/pages/interior-design")} // ✅ Expo Router÷
             variant="primary"
           >
             Start project
@@ -192,7 +192,7 @@ const DashboardScreen = () => {
             </View>
           </View>
           <Button
-            // onPress={() => router.push("/pages/exterior-design")} // ✅ Expo Router
+            onPress={() => router.push("/pages/exterior-design")} 
             variant="primary"
           >
             Start project
