@@ -2,51 +2,61 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-// ✅ CORRECT Base URL (without trailing slash)
-const BASE_URL = "https://api.unitec.run.place";
+const BASE_URL = "https://api.unitec.run.place"; // No trailing slash
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
+  timeout: 120000, // 30 seconds
 });
 
 // Request Interceptor
 apiClient.interceptors.request.use(
   async (config) => {
     try {
-      // Get token
       const token = await SecureStore.getItemAsync('authToken');
       
       if (token && token !== 'null' && token !== 'undefined') {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('✅ Token added to request');
+        console.log('Token added to request');
       }
 
-      // Multipart/Form-Data Handling
       if (config.data instanceof FormData) {
-        delete config.headers['Content-Type'];
+        config.headers['Content-Type'] = 'multipart/form-data';
         
-        console.log('📁 Multipart/Form-Data detected:');
-        console.log('🔹 Method:', config.method?.toUpperCase());
+        console.log('Multipart/Form-Data detected:');
+        console.log('Method:', config.method?.toUpperCase());
+        console.log('Final URL:', BASE_URL + config.url); // Fixed double slash
         
-        console.log('🔹 Final URL:', config.baseURL + '/' + config.url);
-        
-        console.log('🔹 FormData Parts:');
-        if (config.data._parts) {
-          config.data._parts.forEach(([key, value], index) => {
-            if (key === 'avatar' && typeof value === 'object') {
-              console.log(`   ${index}. ${key}: [FILE] ${value.name} (${value.type})`);
-            } else {
-              console.log(`   ${index}. ${key}: ${value}`);
-            }
-          });
+        console.log('FormData Parts:');
+        for (let [key, value] of config.data._parts) {
+          if (key === 'image' && value.uri) {
+            console.log(`   ${key}: [FILE] ${value.name || 'photo.jpg'} (${value.type})`);
+          } else {
+            console.log(`   ${key}: ${value}`);
+          }
         }
       }
 
       return config;
-    } catch (error) {
-      console.error('Request interceptor error:', error);
+    } catch (err) {
+      console.error('Interceptor Error:', err);
       return config;
     }
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response Interceptor - For better error logging
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Response Error:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url,
+    });
+    return Promise.reject(error);
   }
 );
 
