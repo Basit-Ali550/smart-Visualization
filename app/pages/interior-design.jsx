@@ -21,11 +21,17 @@ const InteriorDesignScreen = () => {
   const router = useRouter();
   const [selectedRoom, setSelectedRoom] = useState(null);
 
-  const handleContinue = () => {
-    if (selectedRoom) {
-      router.push("pages/interior-exterior-style", { roomType: selectedRoom });
-    }
-  };
+ const handleContinue = () => {
+  if (selectedRoom) {
+    router.push({
+      pathname: "pages/interior-exterior-style",
+      params: {
+        path: "interior",
+        roomType: selectedRoom.name,  // sirf name bhej rahe hain
+      },
+    });
+  }
+};
 
   const RoomGridItem = ({ item, isSelected, onPress }) => {
     const ImageComponent = item.image;

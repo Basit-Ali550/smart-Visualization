@@ -21,10 +21,16 @@ const ExteriorDesignScreen = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
 
   const handleContinue = () => {
-    if (selectedRoom) {
-      router.push("pages/interior-exterior-style", { roomType: selectedRoom });
-    }
-  };
+  if (selectedRoom) {
+    router.push({
+      pathname: "pages/interior-exterior-style",
+      params: {
+        path: "exterior",
+        elementName: selectedRoom.name,  // Facade, Backyard, etc.
+      },
+    });
+  }
+};
 
   const RoomGridItem = ({ item, isSelected, onPress }) => {
     const ImageComponent = item.image;
