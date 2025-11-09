@@ -8,6 +8,8 @@ export default function PagesLayout() {
       <Stack.Screen name="interior-design" />
             <Stack.Screen name="interior-exterior-style" />
       <Stack.Screen name="project-details-form" />
+      <Stack.Screen name="save-project" />
+
 
       <Stack.Screen name="settings" />
 

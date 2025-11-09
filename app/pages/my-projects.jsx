@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Dimensions,
@@ -103,50 +104,60 @@ const MyProjectsScreen = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const ProjectGridCard = ({ project }) => (
-    <TouchableOpacity
-      className="bg-white p-3 rounded-[12px] shadow-sm overflow-hidden mb-4"
-      style={{ width: CARD_WIDTH }}
-    >
-      <Image
-        source={{ uri: project.image }}
-        className="w-full rounded-[8px] h-24"
-        resizeMode="cover"
-      />
+  const ProjectGridCard = ({ project }) => {
+    const router=useRouter()
+    const handleProjectPress = () => {
+      // Navigate to SaveExportDesign screen with project_id as parameter
+      router.push(`pages/save-project?project_id=${project.id}`);
+    };
 
-      <View className="">
-        <Text
-          className="font-semibold text-[#000000] text-sm mt-1"
-          numberOfLines={1}
-        >
-          {project.title}
-        </Text>
-        <Text12
-          className="text-[#A5A5A5] text-[10px] font-normal mb-1"
-          numberOfLines={1}
-        >
-          {project.design_style} • {project.category}
-        </Text12>
+    return (
+      <TouchableOpacity
+        className="bg-white p-3 rounded-[12px] shadow-sm overflow-hidden mb-4"
+        style={{ width: CARD_WIDTH }}
+        onPress={handleProjectPress} // Add this onPress handler
+      >
+        <Image
+          source={{ uri: project.image }}
+          className="w-full rounded-[8px] h-24"
+          resizeMode="cover"
+        />
 
-        <View className="flex-row justify-between gap-3 items-center">
-          <View className="flex-row items-center space-x-2">
-            <View className="flex-row items-center">
-              <Feather 
-                name="heart" 
-                size={12} 
-                color={project.is_favorite ? "#FF0000" : "#000000"} 
-              />
-              <Text12 className="text-[#767C8C] ml-1">{project.likes}</Text12>
-            </View>
-            <View className="flex-row items-center">
-              <Feather name="eye" size={12} color="#000000" />
-              <Text12 className="text-[#767C8C] ml-1">{project.views}</Text12>
+        <View className="">
+          <Text
+            className="font-semibold text-[#000000] text-sm mt-1"
+            numberOfLines={1}
+          >
+            {project.title}
+          </Text>
+          <Text12
+            className="text-[#A5A5A5] text-[10px] font-normal mb-1"
+            numberOfLines={1}
+          >
+            {project.design_style} • {project.category}
+          </Text12>
+
+          <View className="flex-row justify-between gap-3 items-center">
+            <View className="flex-row items-center space-x-2">
+              <View className="flex-row items-center">
+                <Feather 
+                  name="heart" 
+                  size={12} 
+                  color={project.is_favorite ? "#FF0000" : "#000000"} 
+                />
+                <Text12 className="text-[#767C8C] ml-1">{project.likes}</Text12>
+              </View>
+              <View className="flex-row items-center">
+                <Feather name="eye" size={12} color="#000000" />
+                <Text12 className="text-[#767C8C] ml-1">{project.views}</Text12>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
+
 
   const FilterButton = ({ filter, isActive, onPress }) => (
     <TouchableOpacity
