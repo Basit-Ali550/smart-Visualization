@@ -35,6 +35,50 @@ const UploadPhotoScreen = () => {
   
   const { path, roomType, elementName, selectedStyle } = params;
 
+  // Check if image meets minimum size requirement
+  const checkImageSize = (image) => {
+    return new Promise((resolve) => {
+      if (!image || !image.uri) {
+        resolve(false);
+        return;
+      }
+
+      Image.getSize(
+        image.uri,
+        (width, height) => {
+          const meetsRequirement = width >= 550 && height >= 550;
+          resolve(meetsRequirement);
+        },
+        (error) => {
+          console.log("Error getting image size:", error);
+          resolve(false);
+        }
+      );
+    });
+  };
+
+  // Common function to handle image selection
+  const handleImageSelection = async (result) => {
+    if (!result.canceled && result.assets && result.assets[0]) {
+      const image = result.assets[0];
+      
+      // Check image size
+      const meetsSizeRequirement = await checkImageSize(image);
+      
+      if (!meetsSizeRequirement) {
+        Alert.alert(
+          "Image Too Small",
+          "Please select an image that is at least 550px × 550px or larger for better visualization results.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+
+      setSelectedImage(image);
+      setShowConfirmation(true);
+    }
+  };
+
   // GALLERY → FULL IMAGE (NO CROP)
   const pickImageFromGallery = async () => {
     try {
@@ -50,10 +94,7 @@ const UploadPhotoScreen = () => {
         quality: 1,
       });
 
-      if (!result.canceled) {
-        setSelectedImage(result.assets[0]);
-        setShowConfirmation(true);
-      }
+      await handleImageSelection(result);
     } catch (error) {
       Alert.alert("Error", "Failed to pick image");
     }
@@ -73,10 +114,7 @@ const UploadPhotoScreen = () => {
         quality: 1,
       });
 
-      if (!result.canceled) {
-        setSelectedImage(result.assets[0]);
-        setShowConfirmation(true);
-      }
+      await handleImageSelection(result);
     } catch (error) {
       Alert.alert("Error", "Failed to take photo");
     }
@@ -124,6 +162,11 @@ const UploadPhotoScreen = () => {
                 className="w-full h-[130px] rounded-xl"
                 resizeMode="cover"
               />
+              <View className="mt-2">
+                <Text14 className="text-green-600 font-semibold text-center">
+                  ✓ Image meets size requirements (550px × 550px+)
+                </Text14>
+              </View>
               <Text14 className="mt-4 mb-5 text-[#767C8C]">
                 Is this the photo you want to use for visualization?
               </Text14>
@@ -185,6 +228,12 @@ const UploadPhotoScreen = () => {
                 <View className="flex-1">
                   <Text14 className="text-grayLight">
                     AI guidance: Make sure your {path === "exterior" ? "facade" : "room"} is well-lit for best results
+                  </Text14>
+                  <Text14 className="text-grayLight mt-1">
+                    • Minimum image size: 550px × 550px
+                  </Text14>
+                  <Text14 className="text-grayLight">
+                    • Higher resolution images work better
                   </Text14>
                 </View>
               </View>

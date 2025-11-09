@@ -51,7 +51,8 @@ const LoginScreen = () => {
       if (result.success) {
         const loginSuccess = await login(
           result.data.tokens.access_token,
-          result.data.user
+          result.data.user,
+          result.data.tokens.refresh_token   // یہ لائن ایڈ کرو
         );
 
         if (loginSuccess) {

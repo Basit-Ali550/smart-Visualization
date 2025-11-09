@@ -1,88 +1,107 @@
+// context/AuthContext.js
 import * as SecureStore from 'expo-secure-store';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 const AuthContext = createContext(undefined);
+
+// Global callback for token refresh (used by apiClient)
+let setTokenGlobally = null;
+export const setGlobalTokenUpdater = (updater) => {
+  setTokenGlobally = updater;
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const tokenRef = useRef(token);
+
+  useEffect(() => {
+    tokenRef.current = token;
+  }, [token]);
+
   useEffect(() => {
     checkExistingAuth();
   }, []);
 
+  // Provide updater to apiClient
+  useEffect(() => {
+    setGlobalTokenUpdater((newToken) => {
+      setToken(newToken);
+      tokenRef.current = newToken;
+    });
+  }, []);
+
   const checkExistingAuth = async () => {
     try {
-      const savedToken = await SecureStore.getItemAsync('authToken');
-      const savedUser = await SecureStore.getItemAsync('userData');
-      
+      const [savedToken, savedUser, savedRefresh] = await Promise.all([
+        SecureStore.getItemAsync('authToken'),
+        SecureStore.getItemAsync('userData'),
+        SecureStore.getItemAsync('refreshToken'),
+      ]);
+
       if (savedToken && savedUser) {
         setToken(savedToken);
+        tokenRef.current = savedToken;
         setUser(JSON.parse(savedUser));
-      } else {
-        // Clear any invalid tokens
-        setToken(null);
-        setUser(null);
       }
     } catch (error) {
-      console.error('Error checking auth:', error);
-      setToken(null);
-      setUser(null);
+      console.error('Error loading auth:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const login = async (authToken, userData) => {
-    try {
-      setToken(authToken);
-      setUser(userData);
+  // context/AuthContext.js (صرف login function بدلو)
+const login = async (authToken, userData, refreshToken) => {
+  try {
+    setToken(authToken);
+    tokenRef.current = authToken;
+    setUser(userData);
 
-      await SecureStore.setItemAsync('authToken', authToken);
-      await SecureStore.setItemAsync('userData', JSON.stringify(userData));
-      
-      return true;
-    } catch (error) {
-      console.error('Login error:', error);
-      return false;
-    }
-  };
+    await Promise.all([
+      SecureStore.setItemAsync('authToken', authToken),
+      SecureStore.setItemAsync('refreshToken', refreshToken), // یہ لائن ایڈ کرو
+      SecureStore.setItemAsync('userData', JSON.stringify(userData)),
+    ]);
+
+    return true;
+  } catch (error) {
+    console.error('Login save error:', error);
+    return false;
+  }
+};
 
   const logout = async () => {
-    try {
-      setToken(null);
-      setUser(null);
-      
-      await SecureStore.deleteItemAsync('authToken');
-      await SecureStore.deleteItemAsync('userData');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+    setToken(null);
+    tokenRef.current = null;
+    setUser(null);
+
+    await Promise.all([
+      SecureStore.deleteItemAsync('authToken'),
+      SecureStore.deleteItemAsync('refreshToken'),
+      SecureStore.deleteItemAsync('userData'),
+    ]);
   };
 
-  // Update user data after profile update
   const updateUserData = async (updatedData) => {
+    if (!user) return false;
     try {
-      if (user) {
-        const updatedUser = {
-          ...user,
-          ...updatedData,
-          updated_at: new Date().toISOString()
-        };
-        
-        setUser(updatedUser);
-        await SecureStore.setItemAsync('userData', JSON.stringify(updatedUser));
-        return true;
-      }
-      return false;
+      const updatedUser = {
+        ...user,
+        ...updatedData,
+        updated_at: new Date().toISOString(),
+      };
+      setUser(updatedUser);
+      await SecureStore.setItemAsync('userData', JSON.stringify(updatedUser));
+      return true;
     } catch (error) {
-      console.error('Error updating user data:', error);
+      console.error('Update user error:', error);
       return false;
     }
   };
 
-  // Update user avatar after face verification
   const updateUserAvatar = async (avatarUrl) => {
     return updateUserData({ avatar_url: avatarUrl });
   };
@@ -94,27 +113,19 @@ export const AuthProvider = ({ children }) => {
     logout,
     loading,
     isAuthenticated: !!token,
-    // Add avatar check properties
     hasAvatar: !!user?.avatar_url,
     updateUserAvatar,
     updateUserData,
-    // Add token check method
-    getValidToken: () => token,
+    getValidToken: () => tokenRef.current,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  
   return context;
 };

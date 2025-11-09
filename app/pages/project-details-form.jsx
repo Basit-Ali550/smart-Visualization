@@ -22,8 +22,8 @@ import apiClient from "../../hooks/apiClient";
 const AI_INVENTIONS = [
   { label: "Very Low", value: 1 },
   { label: "Low", value: 2 },
-  { label: "Medium", value: 3 },
-  { label: "High", value: 4 },
+  { label: "Med", value: 3 },
+  { label: "Extreme", value: 4 },
   { label: "Extreme", value: 5 },
 ];
 
@@ -39,8 +39,6 @@ const DESIGN_COUNTS = [
   { label: "1 Design", value: 1 },
   { label: "2 Designs", value: 2 },
   { label: "3 Designs", value: 3 },
-  { label: "5 Designs", value: 5 },
-  { label: "10 Designs", value: 10 },
 ];
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");

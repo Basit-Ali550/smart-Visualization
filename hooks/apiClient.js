@@ -1,61 +1,91 @@
-// hooks/apiClient.js
+// api/apiClient.js
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { setGlobalTokenUpdater } from '../context/AuthContext';
 
-const BASE_URL = "https://api.unitec.run.place"; // No trailing slash
+const BASE_URL = "https://api.unitec.run.place";
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 120000, // 30 seconds
+  timeout: 120000,
 });
 
-// Request Interceptor
+let updateTokenInContext = null;
+setGlobalTokenUpdater((updater) => {
+  updateTokenInContext = updater;
+});
+
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    error ? prom.reject(error) : prom.resolve(token);
+  });
+  failedQueue = [];
+};
+
 apiClient.interceptors.request.use(
   async (config) => {
-    try {
-      const token = await SecureStore.getItemAsync('authToken');
-      
-      if (token && token !== 'null' && token !== 'undefined') {
-        config.headers.Authorization = `Bearer ${token}`;
-        console.log('Token added to request');
-      }
-
-      if (config.data instanceof FormData) {
-        config.headers['Content-Type'] = 'multipart/form-data';
-        
-        console.log('Multipart/Form-Data detected:');
-        console.log('Method:', config.method?.toUpperCase());
-        console.log('Final URL:', BASE_URL + config.url); // Fixed double slash
-        
-        console.log('FormData Parts:');
-        for (let [key, value] of config.data._parts) {
-          if (key === 'image' && value.uri) {
-            console.log(`   ${key}: [FILE] ${value.name || 'photo.jpg'} (${value.type})`);
-          } else {
-            console.log(`   ${key}: ${value}`);
-          }
-        }
-      }
-
-      return config;
-    } catch (err) {
-      console.error('Interceptor Error:', err);
-      return config;
+    const token = await SecureStore.getItemAsync('authToken');
+    if (token && token !== 'null') {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor - For better error logging
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    console.error('API Response Error:', {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-      url: error.config?.url,
-    });
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return apiClient(originalRequest);
+        }).catch(err => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const refreshToken = await SecureStore.getItemAsync('refreshToken');
+        if (!refreshToken) throw new Error('No refresh token');
+
+        // صرف یہی لائن اہم ہے — apiClient نہیں، axios استعمال کرو!
+        const response = await axios.post(`${BASE_URL}/api/v1/auth/refresh`, {
+          refresh_token: refreshToken,
+        });
+
+        const { access_token, refresh_token: newRefreshToken } = response.data.tokens;
+
+        await SecureStore.setItemAsync('authToken', access_token);
+        await SecureStore.setItemAsync('refreshToken', newRefreshToken || refreshToken);
+
+        if (updateTokenInContext) updateTokenInContext(access_token);
+
+        processQueue(null, access_token);
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        return apiClient(originalRequest);
+
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        await Promise.all([
+          SecureStore.deleteItemAsync('authToken'),
+          SecureStore.deleteItemAsync('refreshToken'),
+          SecureStore.deleteItemAsync('userData'),
+        ]);
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
     return Promise.reject(error);
   }
 );
