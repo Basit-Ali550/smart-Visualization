@@ -5,13 +5,14 @@ import {
   Dimensions,
   FlatList,
   Image,
-  SafeAreaView,
+
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Text12,
   Text14,
@@ -27,8 +28,7 @@ const filters = [
   { id: "interior", label: "Interior" },
   { id: "exterior", label: "Exterior" },
   { id: "recent", label: "Recent" },
-  { id: "job", label: "Hamy" },
-  { id: "job1", label: "Hammy" },
+ 
 ];
 const ProjectGridSkeleton = () => (
   <View
@@ -115,6 +115,7 @@ const MyProjectsScreen = () => {
       <TouchableOpacity
         className="bg-white p-3 rounded-[12px] shadow-sm overflow-hidden mb-4"
         style={{ width: CARD_WIDTH }}
+        activeOpacity={0.7}
         onPress={handleProjectPress} // Add this onPress handler
       >
         <Image
@@ -231,6 +232,7 @@ const MyProjectsScreen = () => {
           <TouchableOpacity 
             className="bg-[#0461A6] px-6 py-3 rounded-xl mt-4"
             onPress={() => window.location.reload()} // Or implement retry logic
+            activeOpacity={0.7}
           >
             <Text14 className="text-white">Try Again</Text14>
           </TouchableOpacity>
@@ -260,7 +262,7 @@ const MyProjectsScreen = () => {
                 placeholderTextColor="#767C8C"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
-                className="flex-1 ml-3 text-[16px] font-[Montserrat]"
+                className="flex-1 ml-3 py-2 text-[16px] font-[Montserrat]"
                 style={{ fontWeight: "500" }}
               />
               {searchQuery.length > 0 && (
