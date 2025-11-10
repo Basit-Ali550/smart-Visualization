@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
+import { Formik } from "formik";
 import { useRef, useState } from "react";
 import {
   Alert,
@@ -14,14 +15,16 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Yup from "yup";
 import Appreance from "../../assets/Icon/Appreance.svg";
 import Notification from "../../assets/Icon/Notification.svg";
 import PersonIcon from "../../assets/Icon/PersonIcon.svg";
 import Shield from "../../assets/Icon/Shield.svg";
 import Button from "../../components/ui/Button";
+import InputField from "../../components/ui/InputFeild";
 import ToggleButton from "../../components/ui/ToggleButton";
 import { Text12, Text14, Text16Bold } from "../../components/ui/Typography";
 import { useAuth } from "../../context/AuthContext";
@@ -35,6 +38,7 @@ const ProfileScreen = () => {
 
   // Modal states
   const [modalVisible, setModalVisible] = useState(false);
+  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -46,7 +50,7 @@ const ProfileScreen = () => {
   const { postData, loading } = usePost("api/v1/auth/logout");
   const router = useRouter();
 
-  // Open modal and prefill names
+  // === PERSONAL INFO MODAL ===
   const handlePersonalInfo = () => {
     setFirstName(user?.first_name || "");
     setLastName(user?.last_name || "");
@@ -54,7 +58,6 @@ const ProfileScreen = () => {
     setTimeout(() => firstNameInputRef.current?.focus(), 300);
   };
 
-  // Save name changes
   const handleSaveNames = async () => {
     if (!firstName.trim() || !lastName.trim()) {
       Alert.alert("Error", "Both fields are required.");
@@ -95,7 +98,7 @@ const ProfileScreen = () => {
     }
   };
 
-  // Image Upload Handler - ONLY for profile picture
+  // === PROFILE PICTURE UPLOAD ===
   const handleProfilePictureUpload = async () => {
     try {
       const { status: cameraStatus } =
@@ -191,10 +194,49 @@ const ProfileScreen = () => {
     }
   };
 
+  // === SECURITY MODAL - CHANGE PASSWORD ===
   const handleSecurity = () => {
-    Alert.alert("Security", "This section will open security settings.");
+    setPasswordModalVisible(true);
   };
 
+  const changePasswordSchema = Yup.object().shape({
+    current_password: Yup.string()
+      .min(6, "Current password must be at least 6 characters")
+      .required("Current password is required"),
+    new_password: Yup.string()
+      .min(6, "New password must be at least 6 characters")
+      .required("New password is required"),
+    new_password_confirm: Yup.string()
+      .oneOf([Yup.ref("new_password")], "Passwords must match")
+      .required("Confirm new password is required"),
+  });
+
+  const handleChangePassword = async (values, { setSubmitting, setFieldError }) => {
+    try {
+      await apiClient.post("/api/v1/auth/change-password", {
+        current_password: values.current_password,
+        new_password: values.new_password,
+        new_password_confirm: values.new_password_confirm,
+      });
+
+      Alert.alert("Success", "Password changed successfully!");
+      setPasswordModalVisible(false);
+    } catch (error) {
+      console.error("Change password error:", error);
+      const msg = error.response?.data?.message || "Failed to change password.";
+      if (error.response?.data?.errors) {
+        Object.keys(error.response.data.errors).forEach((key) => {
+          setFieldError(key, error.response.data.errors[key][0]);
+        });
+      } else {
+        Alert.alert("Error", msg);
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // === LOGOUT ===
   const handleLogout = async () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
@@ -360,6 +402,7 @@ const ProfileScreen = () => {
             <ToggleButton value={appearance} onToggle={setAppearance} />
           </View>
         </View>
+
         <View className="bg-white mt-6 p-4 rounded-xl">
           <Text16Bold className="mb-2">Free Plan</Text16Bold>
           <Text14>
@@ -388,7 +431,7 @@ const ProfileScreen = () => {
 
         <Button
           variant="secondary"
-          className="mt-6 "
+          className="mt-6"
           onPress={handleLogout}
           disabled={loading}
         >
@@ -396,102 +439,207 @@ const ProfileScreen = () => {
         </Button>
       </ScrollView>
 
-
-<Modal
-  visible={modalVisible}
-  transparent
-  animationType="fade"
-  onRequestClose={() => setModalVisible(false)}
->
-  <KeyboardAvoidingView
-    behavior={Platform.OS === "ios" ? "padding" : "height"}
-    className="flex-1 justify-center"
-  >
-    <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-      <View className="flex-1 bg-black/60 justify-center items-center px-6">
-        <TouchableWithoutFeedback onPress={() => {}}>
-          <View className="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl">
-            {/* Header */}
-            <View className="px-6 pt-8 pb-6 border-b border-gray-100">
-              <Text className="text-xl font-bold text-center text-gray-900">
-                Edit Personal Information
-              </Text>
-            </View>
-
-            {/* Body */}
-            <View className="px-6 py-6 space-y-5">
-              <View>
-                <Text className="text-sm font-semibold text-gray-700 mb-2">
-                  First Name
-                </Text>
-                <TextInput
-                  ref={firstNameInputRef}
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  placeholder="Enter first name"
-                  className="border border-gray-300 rounded-xl px-4 py-4 text-base bg-gray-50"
-                  autoCapitalize="words"
-                  returnKeyType="next"
-                  onSubmitEditing={() => lastNameInputRef.current?.focus()}
-                />
-              </View>
-
-              <View>
-                <Text className="text-sm font-semibold text-gray-700 mb-2">
-                  Last Name
-                </Text>
-                <TextInput
-                  ref={lastNameInputRef}
-                  value={lastName}
-                  onChangeText={setLastName}
-                  placeholder="Enter last name"
-                  className="border border-gray-300 rounded-xl px-4 py-4 text-base bg-gray-50"
-                  autoCapitalize="words"
-                  returnKeyType="done"
-                  onSubmitEditing={handleSaveNames}
-                />
-              </View>
-            </View>
-
-            {/* Footer Buttons - Proper Spacing & Clean Look */}
-            <View className="px-6 pb-8 pt-4 bg-gray-50/50">
-              <View className="flex-row gap-3">
-                <TouchableOpacity
-                  onPress={() => setModalVisible(false)}
-                  disabled={saving}
-                  className="flex-1 bg-gray-200 py-4 rounded-xl justify-center items-center active:opacity-70"
-                >
-                  <Text className="text-gray-800 font-semibold text-base">
-                    Cancel
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={handleSaveNames}
-                  disabled={saving}
-                  className="flex-1 bg-blue-600 py-4 rounded-xl justify-center items-center active:opacity-80"
-                >
-                  {saving ? (
-                    <View className="flex-row items-center">
-                      <Feather name="loader" size={18} color="white" className="animate-spin mr-2" />
-                      <Text className="text-white font-semibold text-base">
-                        Saving...
-                      </Text>
-                    </View>
-                  ) : (
-                    <Text className="text-white font-semibold text-base">
-                      Save Changes
+      {/* === PERSONAL INFO MODAL === */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="flex-1 justify-center"
+        >
+          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+            <View className="flex-1 bg-black/60 justify-center items-center px-6">
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View className="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl">
+                  <View className="px-6 pt-8 pb-6 border-b border-gray-100">
+                    <Text className="text-xl font-bold text-center text-gray-900">
+                      Edit Personal Information
                     </Text>
-                  )}
-                </TouchableOpacity>
-              </View>
+                  </View>
+
+                  <View className="px-6 py-6 space-y-5">
+                    <View>
+                      <Text className="text-sm font-semibold text-gray-700 mb-2">
+                        First Name
+                      </Text>
+                      <TextInput
+                        ref={firstNameInputRef}
+                        value={firstName}
+                        onChangeText={setFirstName}
+                        placeholder="Enter first name"
+                        className="border border-gray-300 rounded-xl px-4 py-4 text-base bg-gray-50"
+                        autoCapitalize="words"
+                        returnKeyType="next"
+                        onSubmitEditing={() => lastNameInputRef.current?.focus()}
+                      />
+                    </View>
+
+                    <View>
+                      <Text className="text-sm font-semibold text-gray-700 mb-2">
+                        Last Name
+                      </Text>
+                      <TextInput
+                        ref={lastNameInputRef}
+                        value={lastName}
+                        onChangeText={setLastName}
+                        placeholder="Enter last name"
+                        className="border border-gray-300 rounded-xl px-4 py-4 text-base bg-gray-50"
+                        autoCapitalize="words"
+                        returnKeyType="done"
+                        onSubmitEditing={handleSaveNames}
+                      />
+                    </View>
+                  </View>
+
+                  <View className="px-6 pb-8 pt-4 bg-gray-50/50">
+                    <View className="flex-row gap-3">
+                      <TouchableOpacity
+                        onPress={() => setModalVisible(false)}
+                        disabled={saving}
+                        className="flex-1 bg-gray-200 py-4 rounded-xl justify-center items-center active:opacity-70"
+                      >
+                        <Text className="text-gray-800 font-semibold text-base">
+                          Cancel
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        onPress={handleSaveNames}
+                        disabled={saving}
+                        className="flex-1 bg-blue-600 py-4 rounded-xl justify-center items-center active:opacity-80"
+                      >
+                        {saving ? (
+                          <View className="flex-row items-center">
+                            <Feather name="loader" size={18} color="white" className="animate-spin mr-2" />
+                            <Text className="text-white font-semibold text-base">
+                              Saving...
+                            </Text>
+                          </View>
+                        ) : (
+                          <Text className="text-white font-semibold text-base">
+                            Save Changes
+                          </Text>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </View>
-    </TouchableWithoutFeedback>
-  </KeyboardAvoidingView>
-</Modal>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* === CHANGE PASSWORD MODAL === */}
+      <Modal
+        visible={passwordModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPasswordModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="flex-1 justify-center"
+        >
+          <TouchableWithoutFeedback onPress={() => setPasswordModalVisible(false)}>
+            <View className="flex-1 bg-black/60 justify-center items-center px-6">
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View className="bg-gray-100 w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl">
+                  <View className="px-6 pt-8 pb-6 border-b border-gray-100">
+                    <Text className="text-xl font-bold text-center text-gray-900">
+                      Change Password
+                    </Text>
+                  </View>
+
+                  <Formik
+                    initialValues={{
+                      current_password: "",
+                      new_password: "",
+                      new_password_confirm: "",
+                    }}
+                    validationSchema={changePasswordSchema}
+                    onSubmit={handleChangePassword}
+                  >
+                    {({
+                      handleSubmit,
+                      isSubmitting,
+                      values,
+                      errors,
+                      touched,
+                      handleChange,
+                      handleBlur,
+                    }) => (
+                      <>
+                        <View className="px-4 py-6 space-y-5">
+                          <InputField
+                            label="Current Password"
+                            name="current_password"
+                            type="password"
+                            placeholder="Enter current password"
+                            required
+                          />
+                          <InputField
+                          className="py-6"
+
+                            label="New Password"
+                            name="new_password"
+                            type="password"
+                            placeholder="Enter new password"
+                            required
+                          />
+                          <InputField
+                            label="Confirm New Password"
+                            name="new_password_confirm"
+                            type="password"
+                            placeholder="Confirm new password"
+                            required
+                          />
+                        </View>
+
+                        <View className="px-6 pb-8 pt-4 bg-gray-50/50">
+                          <View className="flex-row gap-3">
+                            <TouchableOpacity
+                              onPress={() => setPasswordModalVisible(false)}
+                              disabled={isSubmitting}
+                              className="flex-1 bg-gray-200 py-4 rounded-xl justify-center items-center active:opacity-70"
+                            >
+                              <Text className="text-gray-800 font-semibold text-base">
+                                Cancel
+                              </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              onPress={handleSubmit}
+                              disabled={isSubmitting}
+                              className="flex-1 bg-blue-600 py-4 rounded-xl justify-center items-center active:opacity-80"
+                            >
+                              {isSubmitting ? (
+                                <View className="flex-row items-center">
+                                  <Feather name="loader" size={18} color="white" className="animate-spin mr-2" />
+                                  <Text className="text-white font-semibold text-base">
+                                    Saving...
+                                  </Text>
+                                </View>
+                              ) : (
+                                <Text className="text-white font-semibold text-base">
+                                  Change Password
+                                </Text>
+                              )}
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      </>
+                    )}
+                  </Formik>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 };
