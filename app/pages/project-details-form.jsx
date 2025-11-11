@@ -5,13 +5,12 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
-  Image,
   Platform,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -28,11 +27,9 @@ const AI_INVENTIONS = [
 ];
 
 const HOUSE_ANGLES = [
-  { label: "Front View", value: "front" },
-  { label: "Back View", value: "back" },
-  { label: "Left Side", value: "left" },
-  { label: "Right Side", value: "right" },
-  { label: "Bird's Eye", value: "top" },
+  { label: "Front View", value: "Front of House" },
+  { label: "Back View", value: "Back of House" },
+  { label: "Side View", value: "Side of House" },
 ];
 
 const DESIGN_COUNTS = [
@@ -73,7 +70,7 @@ const ProjectDetailsForm = () => {
     if (Platform.OS === 'android') {
       return uri.startsWith('file://') ? uri : `file://${uri}`;
     }
-    return uri;
+    return uri; 
   };
 
   const handleSubmit = async () => {
@@ -105,7 +102,7 @@ const ProjectDetailsForm = () => {
     }
 
     formData.append("design_style", style?.name || "Modern");
-    formData.append("ai_intervention", ["Very Low", "Low", "Medium", "High", "Extreme"][aiInvention - 1]);
+    formData.append("ai_intervention", ["Very Low", "Low", "Med", "Extreme", "Extreme"][aiInvention - 1]);
     formData.append("no_designs", designCount);
     formData.append("keep_structural_elements", "false");
 
@@ -115,6 +112,9 @@ const ProjectDetailsForm = () => {
       type: uploadedPhoto.mimeType || "image/jpeg",
       name: uploadedPhoto.fileName || `design_${Date.now()}.jpg`,
     });
+
+    // YEH LINE ADD KI HAI SIRF – API CALL SE PEHLE PAYLOAD LOG KARNE KE LIYE
+    console.log("PAYLOAD BEFORE API CALL:", formData);
 
     try {
       const response = await apiClient.post("/api/v1/design/projects", formData, {
@@ -130,12 +130,12 @@ const ProjectDetailsForm = () => {
         {
           text: "View Projects",
           onPress: () => {
-router.replace({
-        pathname: "/pages/compare-result",
-        params: {
-          project: JSON.stringify(response.data), // Send full project
-        },
-      });
+            router.replace({
+              pathname: "/pages/compare-result",
+              params: {
+                project: JSON.stringify(response.data),
+              },
+            });
           },
         },
       ]);
@@ -175,7 +175,7 @@ router.replace({
 
   return (
     <SafeAreaView className="flex-1 bg-[#F5F6FA]">
-      <ScrollView className="flex-1 px-5 pt-6" showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 pt-6" showsVerticalScrollIndicator={false}>
         <Text20 className="text-center font-bold text-[#333] mb-2">
           Complete Your Project
         </Text20>
@@ -184,16 +184,7 @@ router.replace({
         </Text14>
 
         {/* Photo Preview */}
-        {uploadedPhoto && (
-          <View className="mb-6 bg-white rounded-2xl overflow-hidden shadow-sm">
-            <Text16Bold className="p-4">Your Uploaded Photo</Text16Bold>
-            <Image
-              source={{ uri: uploadedPhoto.uri }}
-              className="w-full h-64"
-              resizeMode="cover"
-            />
-          </View>
-        )}
+ 
 
         {/* Project Name */}
         <View className="mb-6">
