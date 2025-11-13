@@ -1,7 +1,8 @@
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   FlatList,
   Image,
@@ -18,108 +19,111 @@ import {
   Text16Bold,
   Text20,
 } from "../../components/ui/Typography";
-
-// Your provided Button component
+import useGet from "../../hooks/useGet";
 
 const { width } = Dimensions.get("window");
-const CARD_WIDTH = (width - 48) / 2; // 48 = padding (24*2)
-
-const mockProjects = [
-  {
-    id: 1,
-    title: "$4.99/sq ft",
-    type: "Interior",
-    image:
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=200&fit=crop",
-    quality: "High-quality image",
-    createdAt: "2024-01-15",
-    category: "Living Room",
-  },
-  {
-    id: 2,
-    title: "$4.99/sq ft",
-    type: "Interior",
-    image:
-      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=200&fit=crop",
-    quality: "High-quality image",
-    createdAt: "2024-01-10",
-    category: "Kitchen",
-  },
-  {
-    id: 3,
-    title: "$4.99/sq ft",
-    type: "Interior",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=300&h=200&fit=crop",
-    quality: "High-quality image",
-    createdAt: "2024-01-05",
-    category: "Bedroom",
-  },
-  {
-    id: 4,
-    title: "$4.99/sq ft",
-    type: "Exterior",
-    image:
-      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=300&h=200&fit=crop",
-    quality: "High-quality image",
-    createdAt: "2024-01-01",
-    category: "Exterior",
-  },
-  {
-    id: 5,
-    title: "$4.99/sq ft",
-    type: "Interior",
-    image:
-      "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=300&h=200&fit=crop",
-    quality: "High-quality image",
-    createdAt: "2023-12-28",
-    category: "Dining Room",
-  },
-  {
-    id: 6,
-    title: "$4.99/sq ft",
-    type: "Interior",
-    image:
-      "https://images.unsplash.com/photo-1584621247940-688ce92e3e2e?w=300&h=200&fit=crop",
-    quality: "High-quality image",
-    createdAt: "2023-12-25",
-    category: "Bathroom",
-  },
-];
+const CARD_WIDTH = (width - 48) / 2;
 
 const filters = [
   { id: "all", label: "All" },
   { id: "interior", label: "Interior" },
   { id: "exterior", label: "Exterior" },
   { id: "recent", label: "Recent" },
-  { id: "job", label: "Hamy" },
-  { id: "job1", label: "Hammy" },
 ];
+
+// Skeleton Loading Component for Material Cards
+const MaterialCardSkeleton = () => (
+  <View
+    className="bg-gray-100 rounded-[12px] overflow-hidden mb-4 border border-gray-200"
+    style={{ width: CARD_WIDTH }}
+  >
+    {/* Image Skeleton */}
+    <View className="w-full h-[120px] bg-gray-200 rounded-t-[8px]" />
+    
+    {/* Content Skeleton */}
+    <View className="p-2">
+      <View className="flex-row justify-between mb-2">
+        <View className="h-4 bg-gray-300 rounded w-3/5" />
+        <View className="flex-row items-center space-x-1.5">
+          <View className="h-3 w-3 bg-gray-300 rounded" />
+          <View className="h-4 bg-gray-300 rounded w-6" />
+        </View>
+      </View>
+      <View className="h-3 bg-gray-300 rounded w-4/5 mb-1" />
+      <View className="h-3 bg-gray-300 rounded w-3/4" />
+    </View>
+  </View>
+);
+
+// Skeleton array for loading state
+const skeletonData = Array.from({ length: 4 }, (_, index) => ({ id: `skeleton-${index}` }));
 
 const SelectMaterialsScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
-  const [projects, setProjects] = useState(mockProjects);
-  const [selectedProjectId, setSelectedProjectId] = useState(null); // Track selected project
+  const [selectedMaterialId, setSelectedMaterialId] = useState(null);
+  const [page, setPage] = useState(1);
+  const [allMaterials, setAllMaterials] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  
   const router = useRouter();
-  const filteredProjects = projects.filter((project) => {
-    const matchesSearch = project.title
+
+  const { data: materialData, loading, error } = useGet(`/api/v1/materials?page=${page}&page_size=6`);
+
+  // Combine materials when new data is fetched
+  useEffect(() => {
+    if (materialData?.materials) {
+      if (page === 1) {
+        // First page - replace all materials
+        setAllMaterials(materialData.materials);
+      } else {
+        // Subsequent pages - append materials
+        setAllMaterials(prev => [...prev, ...materialData.materials]);
+      }
+      
+      // Check if there are more pages
+      setHasMore(page < materialData.total_pages);
+    }
+  }, [materialData, page]);
+
+  // Reset pagination when filter or search changes
+  useEffect(() => {
+    setPage(1);
+    setAllMaterials([]);
+    setHasMore(true);
+  }, [activeFilter, searchQuery]);
+
+  const transformedMaterials = allMaterials.map(material => ({
+    id: material.id,
+    price_per_sqft: `$${material.price_per_sqft}/sq ft`,
+    material_type: material.material_type,
+    thumbnail_url: material.thumbnail_url,
+    quality: "High-quality image",
+    createdAt: "2024-01-15",
+    category: material.material_type,
+    title: material.name,
+    image: material.thumbnail_url,
+    rating: material.rating,
+    is_favorite: material.is_favorite
+  }));
+
+  const filteredMaterials = transformedMaterials.filter((material) => {
+    const matchesSearch = material.title
       .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+      .includes(searchQuery.toLowerCase()) ||
+      material.material_type.toLowerCase().includes(searchQuery.toLowerCase());
 
     let matchesFilter = true;
     switch (activeFilter) {
       case "interior":
-        matchesFilter = project.type === "Interior";
+        matchesFilter = material.material_type.toLowerCase().includes("interior");
         break;
       case "exterior":
-        matchesFilter = project.type === "Exterior";
+        matchesFilter = material.material_type.toLowerCase().includes("exterior");
         break;
       case "recent":
-        const projectDate = new Date(project.createdAt);
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        matchesFilter = projectDate >= weekAgo;
+        matchesFilter = true;
         break;
       default:
         matchesFilter = true;
@@ -128,19 +132,38 @@ const SelectMaterialsScreen = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const ProjectGridCard = ({ project }) => {
-    const isSelected = project.id === selectedProjectId;
+    const getUniqueKey = (item, index) => {
+    return `${item.id}-${index}`;
+  };
+
+  // Load more data when reaching end of list
+  const loadMore = useCallback(() => {
+    if (!loading && !isLoadingMore && hasMore) {
+      setIsLoadingMore(true);
+      setPage(prev => prev + 1);
+    }
+  }, [loading, isLoadingMore, hasMore]);
+
+  // Reset loading more state when data is loaded
+  useEffect(() => {
+    if (!loading) {
+      setIsLoadingMore(false);
+    }
+  }, [loading]);
+
+  const MaterialGridCard = ({ material }) => {
+    const isSelected = material.id === selectedMaterialId;
 
     return (
       <TouchableOpacity
-        onPress={() => setSelectedProjectId(project.id)} // Toggle selection
+        onPress={() => setSelectedMaterialId(material.id)}
         className={`bg-white rounded-[12px] shadow-sm overflow-hidden mb-4 ${
-          isSelected ? "border border-[#0461A6]" : ""
-        }`} // Add 1px border if selected
+          isSelected ? "border-2 border-[#0461A6]" : "border border-gray-200"
+        }`}
         style={{ width: CARD_WIDTH }}
       >
         <Image
-          source={{ uri: project.image }}
+          source={{ uri: material.image }}
           className="w-full h-[120px] rounded-t-[8px]"
           resizeMode="cover"
         />
@@ -155,18 +178,26 @@ const SelectMaterialsScreen = () => {
               className="font-semibold text-[#000000] text-sm mt-1"
               numberOfLines={1}
             >
-              {project.title}
+              {material.title}
             </Text>
             <View className="flex-row items-center space-x-1.5">
               <AntDesign name="star" size={12} color="#FFC900" />
-              <Text className="font-semibold text-[#000000] text-sm">4.7</Text>
+              <Text className="font-semibold text-[#000000] text-sm">
+                {material.rating}
+              </Text>
             </View>
           </View>
           <Text12
             className="text-[#A5A5A5] text-[10px] font-normal"
             numberOfLines={1}
           >
-            {project.quality}
+            {material.price_per_sqft}
+          </Text12>
+          <Text12
+            className="text-[#A5A5A5] text-[10px] font-normal"
+            numberOfLines={1}
+          >
+            {material.quality}
           </Text12>
         </View>
       </TouchableOpacity>
@@ -186,18 +217,101 @@ const SelectMaterialsScreen = () => {
     </TouchableOpacity>
   );
 
+  // Footer component for loading indicator
+  const ListFooterComponent = () => {
+    if (!isLoadingMore) return null;
+    
+    return (
+      <View className="py-4">
+        <ActivityIndicator size="small" color="#0461A6" />
+        <Text12 className="text-center text-gray-500 mt-2">
+          Loading more materials...
+        </Text12>
+      </View>
+    );
+  };
+
+  // Render skeleton loading state for initial load
+  if (loading && page === 1) {
+    return (
+      <SafeAreaView className="flex-1">
+        <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+          {/* Header Section */}
+          <View className="pt-2 pb-4">
+            <View className="flex-row justify-center items-center mb-6">
+              <Text20 className="text-[18px] text-[#464646] text-center font-bold">
+                Material Catalog
+              </Text20>
+            </View>
+
+            {/* Filter Tabs Skeleton */}
+            <View className="mb-2">
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingRight: 20 }}
+              >
+                {filters.map((filter) => (
+                  <View
+                    key={filter.id}
+                    className="px-5 py-2.5 rounded-xl bg-gray-200 mr-2"
+                  >
+                    <View className="h-4 w-12 bg-gray-300 rounded" />
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+
+          {/* Title Section Skeleton */}
+          <View className="mb-4">
+            <View className="h-6 bg-gray-300 rounded w-2/5 mb-2" />
+            <View className="h-4 bg-gray-300 rounded w-3/4" />
+          </View>
+
+          {/* Skeleton Grid */}
+          <View className="pt-4 pb-8">
+            <FlatList
+              data={skeletonData}
+              renderItem={() => <MaterialCardSkeleton />}
+              keyExtractor={(item) => item.id}
+              numColumns={2}
+              columnWrapperStyle={{ justifyContent: "space-between" }}
+              scrollEnabled={false}
+              showsVerticalScrollIndicator={false}
+            />
+            
+            {/* Button Skeleton */}
+            <View className="mt-4">
+              <View className="w-full h-12 bg-gray-300 rounded-lg" />
+            </View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  if (error && page === 1) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center">
+        <Text>Error loading materials: {error.message}</Text>
+        <Button onPress={() => router.back()} variant="primary" className="mt-4">
+          Go Back
+        </Button>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView className="flex-1 ">
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-        {/* Header Section */}
-        <View className=" pt-2 pb-4">
+    <SafeAreaView className="flex-1">
+      <View className="flex-1">
+        <View className="pt-2 pb-4">
           <View className="flex-row justify-center items-center mb-6">
             <Text20 className="text-[18px] text-[#464646] text-center font-bold">
-              My Projects
+              Material Catalog
             </Text20>
           </View>
 
-          {/* Filter Tabs */}
           <View className="mb-2">
             <ScrollView
               horizontal
@@ -216,50 +330,64 @@ const SelectMaterialsScreen = () => {
           </View>
         </View>
 
-        <View className=" mb-4">
-          <Text16Bold>Material Catalog</Text16Bold>
+        <View className="mb-4">
+          <Text16Bold>Available Materials</Text16Bold>
           <Text12 className="mt-1">
             Select materials to apply to your design
           </Text12>
         </View>
-        {/* Projects Grid */}
-        <View className=" pt-4 pb-8">
-          {filteredProjects.length > 0 ? (
+
+        <View className="flex-1 pt-4 pb-8">
+          {filteredMaterials.length > 0 ? (
             <FlatList
-              data={filteredProjects}
-              renderItem={({ item }) => <ProjectGridCard project={item} />}
-              keyExtractor={(item) => item.id.toString()}
+              data={filteredMaterials}
+              renderItem={({ item }) => <MaterialGridCard material={item} />}
+              keyExtractor={(item, index) => getUniqueKey(item, index)}
               numColumns={2}
               columnWrapperStyle={{ justifyContent: "space-between" }}
-              scrollEnabled={false}
               showsVerticalScrollIndicator={false}
+              onEndReached={loadMore}
+              onEndReachedThreshold={0.5}
+              ListFooterComponent={ListFooterComponent}
+              contentContainerStyle={{ paddingBottom: 20 }}
             />
           ) : (
             <View className="items-center justify-center py-16">
               <Feather name="folder" size={64} color="#D1D5DB" />
               <Text16Bold className="text-gray-400 mt-4 mb-2">
-                No projects found
+                No materials found
               </Text16Bold>
               <Text14 className="text-gray-400 text-center">
                 {searchQuery
                   ? "Try adjusting your search terms"
-                  : "Create your first project to get started"}
+                  : "No materials available"}
               </Text14>
             </View>
           )}
-          <View>
+          
+          <View className="mt-4 px-4">
             <Button
-              onPress={() => router.push("Pages/MaterialDetails")}
+              onPress={() => {
+                if (selectedMaterialId) {
+                  router.push({
+                    pathname: "pages/MaterialDetails",
+                    params: { materialId: selectedMaterialId }
+                  });
+                } else {
+                  alert("Please select a material first");
+                }
+              }}
               variant="primary"
               className="w-full"
+              disabled={!selectedMaterialId}
             >
-              Visualize my design
+              {selectedMaterialId ? "Visualize my design" : "Select a material to continue"}
             </Button>
           </View>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
 
-export default SelectMaterialsScreen;
+export default SelectMaterialsScreen; 

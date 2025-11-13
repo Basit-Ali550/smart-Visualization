@@ -206,7 +206,7 @@ const DesignStylesScreen = () => {
       {/* Continue Button (Bottom fixed) */}
       <View className="absolute bottom-4 w-full">
         <Button
-          onPress={() => router.push("Pages/RecommendedStyles")}
+          onPress={() => router.push("pages/RecommendedStyles")}
           className="w-full"
         >
           Continue to color

@@ -34,8 +34,6 @@ const UploadPhotoScreen = () => {
   const router = useRouter();
   
   const { path, roomType, elementName, selectedStyle } = params;
-
-  // Check if image meets minimum size requirement
   const checkImageSize = (image) => {
     return new Promise((resolve) => {
       if (!image || !image.uri) {
@@ -57,7 +55,6 @@ const UploadPhotoScreen = () => {
     });
   };
 
-  // Common function to handle image selection
   const handleImageSelection = async (result) => {
     if (!result.canceled && result.assets && result.assets[0]) {
       const image = result.assets[0];
@@ -100,7 +97,6 @@ const UploadPhotoScreen = () => {
     }
   };
 
-  // CAMERA → FULL IMAGE (NO CROP)
   const takePhoto = async () => {
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();

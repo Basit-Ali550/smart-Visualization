@@ -58,6 +58,8 @@ const MyProjectsScreen = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   
   const { data: projectsData, loading, error } = useGet('/api/v1/design/projects');
+
+  console.log({projectsData, error})
   
   const transformProjectData = (apiProject) => {
     const generation = apiProject.generations?.[0];
@@ -262,7 +264,7 @@ const MyProjectsScreen = () => {
                 placeholderTextColor="#767C8C"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
-                className="flex-1 ml-3 py-2 text-[16px] font-[Montserrat]"
+                className="flex-1 ml-3 py-1 text-[16px] font-[Montserrat]"
                 style={{ fontWeight: "500" }}
               />
               {searchQuery.length > 0 && (

@@ -167,7 +167,7 @@ const SelectColorsScreen = () => {
     if (selectedPalette) {
       // 🔑 AI Data Note: The array of hex codes is the data you pass to your AI
       console.log("Colors to send to AI:", selectedPalette.colors);
-      router.push("Pages/SelectMaterials");
+      router.push("pages/SelectMaterials");
       Alert.alert(
         "AI Input Ready",
         `Sending ${selectedPalette.colors.length} colors to the AI engine.`

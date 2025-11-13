@@ -16,7 +16,7 @@ const mockData = {
       id: 1,
       title: "Modern Living Room",
       image:
-        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=100&fit=crop",
+        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=200&fit=crop",
       lastEdited: "Today",
       style: "Modern",
     },
@@ -225,7 +225,7 @@ const DashboardScreen = () => {
           <View className="flex-row justify-between items-center mb-4">
             <Text16Bold>Popular Styles</Text16Bold>
             <TouchableOpacity
-            // onPress={() => router.push("/pages/styles")} // ✅ Expo Router
+            onPress={() => router.push("/pages/SelectMaterials")} // ✅ Expo Router
             >
               <Text className="text-[#0461A6]">View all</Text>
             </TouchableOpacity>
