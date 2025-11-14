@@ -13,8 +13,6 @@ export default function Index() {
       </View>
     );
   }
-
-  // Auto redirect based on auth status
   return isAuthenticated ? (
     <Redirect href="/pages/home" />
   ) : (
