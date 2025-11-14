@@ -1,4 +1,5 @@
 import Slider from "@react-native-community/slider";
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -16,6 +17,7 @@ import {
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Ai from "../../assets/Icon/Ai.svg";
 import Button from "../../components/ui/Button";
 import { Text14, Text16Bold, Text20 } from "../../components/ui/Typography";
 import apiClient from "../../hooks/apiClient";
@@ -416,40 +418,73 @@ const ProjectDetailsForm = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-[#F5F6FA]">
-      <ScrollView className="flex-1 pt-6" showsVerticalScrollIndicator={false}>
-        <Text20 className="text-center font-bold text-[#333] mb-2">
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        <Text20 className="text-center font-bold text-[#333] mb-4">
           Complete Your Project
         </Text20>
-        <Text14 className="text-center text-gray-600 mb-8">
-          Add details to generate AI designs
-        </Text14>
+   
 
-        {/* AI Recommendation Button */}
-        <View className="mb-6 px-4">
-          <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-            <TouchableOpacity
+        {/* AI Recommendation Button with Gradient */}
+        <View className="mb-6 rounded-2xl">
+          <Animated.View>
+          
+              <LinearGradient
+                colors={['#0461A6', '#034372']}
+              
+                style={{
+               
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingVertical: 16,
+                  paddingHorizontal:16,
+                  borderRadius:16,
+                  opacity: aiLoading ? 0.7 : 1
+                }}
+              
+              >
+                  <View className="flex-row w-full  justify-between gap-3 mb-2">
+                          <View className="flex-row gap-3">
+                            <Ai />
+                            <Text className="text-[#FFFFFF] text-[16px] font-semibold mt-2">
+                              AI Analysis
+                            </Text>
+                          </View>
+                          <View>
+                            <Text className="text-[#FFFFFF] text-right text-[18px] font-semibold ">
+                              94%{" "}
+                            </Text>
+                            <Text className="text-[#F5F6FA] text-right text-[14px] ">
+                              Match Confidence
+                            </Text>
+                          </View>
+                        </View>
+                        <Text className="text-[#F5F6FA] text-sm font-normal my-4 ">
+          Our AI has analyzed your room's dimensions, lighting, architectural
+          features, and existing elements to recommend styles that would work
+          best for your space.
+        </Text>
+                  <TouchableOpacity
               onPress={getAIRecommendations}
               disabled={aiLoading}
-              className={`flex-row items-center justify-center py-4 rounded-2xl ${
-                aiLoading ? "bg-gray-400" : "bg-[#0461A6]"
-              } shadow-lg`}
+              className="rounded-2xl w-full mx-4 bg-white p-4 flex flex-row justify-center shadow-lg overflow-hidden"
             >
-              {aiLoading ? (
-                <>
-                  <ActivityIndicator color="white" size="small" className="mr-2" />
-                  <Text className="text-white text-base font-semibold">
-                    Analyzing Your Photo...
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <Text className="text-white text-lg font-bold mr-2">✨</Text>
-                  <Text className="text-white text-base font-semibold">
-                    Get AI Style Recommendations
-                  </Text>
-                </>
-              )}
+                {aiLoading ? (
+                  <>
+                    <ActivityIndicator color="white" size="small" style={{ marginRight: 8 }} />
+                    <Text className="text-[#034372] text-base font-semibold">
+                      Analyzing Your Photo...
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Text className="text-white text-lg font-bold mr-2">✨</Text>
+                    <Text className="text-[#034372]  text-base font-semibold">
+                      Get AI Style Recommendations
+                    </Text>
+                  </>
+                )}
             </TouchableOpacity>
+              </LinearGradient>
           </Animated.View>
           
           {aiLoading && (
@@ -556,7 +591,7 @@ const ProjectDetailsForm = () => {
         )}
 
         {/* Rest of your form components remain the same */}
-        <View className="mb-6 px-4">
+        <View className="mb-6">
           <Text16Bold>Project Name</Text16Bold>
           <TextInput
             value={projectName}
@@ -592,7 +627,7 @@ const ProjectDetailsForm = () => {
           </View>
         )}
 
-        <View className="mb-6 bg-white rounded-2xl p-6 shadow-sm mx-4">
+        <View className="mb-6 bg-white rounded-2xl p-6 shadow-sm ">
           <View className="flex-row justify-between items-center mb-4">
             <Text16Bold>AI Creativity Level</Text16Bold>
             <View className="px-3 py-1 rounded-full" style={{ backgroundColor: `${creativityInfo.color}15` }}>
@@ -662,7 +697,7 @@ const ProjectDetailsForm = () => {
           </View>
         </View>
 
-        <View className="mb-8 z-50 px-4">
+        <View className="mb-8 z-50">
           <Text16Bold className="mb-2">Number of Designs</Text16Bold>
           <DropDownPicker
             open={openDesignCount}
@@ -678,7 +713,7 @@ const ProjectDetailsForm = () => {
           />
         </View>
 
-        <View className="px-4 mb-10">
+        <View className="mb-10">
           <Button
             onPress={handleSubmit}
             variant="primary"

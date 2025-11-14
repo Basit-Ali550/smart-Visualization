@@ -10,17 +10,14 @@ export default function PagesLayout() {
       <Stack.Screen name="project-details-form" />
       <Stack.Screen name="save-project" />
 
+      <Stack.Screen name="compare-result" />
 
       <Stack.Screen name="settings" />
-
-      {/* ✅ Add all the missing routes that you're trying to navigate to */}
       <Stack.Screen name="profile" />
       <Stack.Screen name="notifications" />
       <Stack.Screen name="my-projects" />
       <Stack.Screen name="styles" />
       <Stack.Screen name="style-details" />
-
-      {/* Add more routes as needed */}
     </Stack>
   );
 }

@@ -17,8 +17,6 @@
         "foregroundImage": "assets/Icon/Layer.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
       "package": "com.ea.amanullah.smartVisualization"
     },
     "web": {
@@ -31,7 +29,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "assets/Icon/Layer.png"
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
         }
       ],
       "expo-mail-composer"
