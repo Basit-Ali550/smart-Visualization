@@ -1,10 +1,17 @@
 
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { ImageBackground, Text, View } from 'react-native';
 import Logo from "../../assets/Icon/Logo.svg";
 import Visualize from "../../assets/images/step.jpg";
 import Button from '../../components/ui/Button';
 const Step1 = () => {
+    const router = useRouter();
+
+  const handleNext = () => {
+    router.push('/onboarding/step2');
+  };
+
   return (
     <View className="flex-1">
       <ImageBackground
@@ -27,9 +34,9 @@ const Step1 = () => {
           className="w-full"
           style={{
             
-            height: 500,
+            height: 448,
             position: 'absolute',
-            top: 364,
+            bottom:0,
             transform: [{ rotate: '180.06deg' }]
           }}
         />
@@ -57,7 +64,7 @@ Start by taking or uploading a photo to{'\n'} instantly begin visualizing your d
 
 
 </View>
-          <Button variant="primary" className="py-4">
+          <Button variant="primary" className="py-4" onPress={handleNext}>
             Next
           </Button>
         </View>

@@ -52,7 +52,7 @@ const DashboardScreen = () => {
   // Render recent project item
   const renderProjectItem = ({ item }) => (
     <TouchableOpacity
-      onPress={() => router.push("/pages/profile")}
+      // onPress={() => router.push("/pages/profile")}
       className="p-3 bg-white flex-1 m-2 rounded-xl"
     >
       <View className="relative">

@@ -38,56 +38,57 @@ const LoginScreen = () => {
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
   });
-  // app/auth/login.jsx - Update the handleLogin function
-  const handleLogin = async (values) => {
-    try {
-      const payload = {
-        email: values.email,
-        password: values.password,
-      };
 
-      const result = await postData(payload);
+ // app/auth/login.jsx - Update the handleLogin function
+const handleLogin = async (values) => {
+  try {
+    const payload = {
+      email: values.email,
+      password: values.password,
+    };
 
-      if (result.success) {
-        const loginSuccess = await login(
-          result.data.tokens.access_token,
-          result.data.user,
-          result.data.tokens.refresh_token   // یہ لائن ایڈ کرو
-        );
+    const result = await postData(payload);
 
-        if (loginSuccess) {
-          // Check if user needs face verification based on avatar_url
-          const needsFaceVerification = !result.data.user.avatar_url;
+    if (result.success) {
+      const loginSuccess = await login(
+        result.data.tokens.access_token,
+        result.data.user,
+        result.data.tokens.refresh_token   // Corrected this line
+      );
 
-          console.log("Avatar URL:", result.data.user.avatar_url);
-          console.log("Needs face verification:", needsFaceVerification);
+      if (loginSuccess) {
+        // Check if user needs face verification based on avatar_url
+        const needsFaceVerification = !result.data.user.avatar_url;
 
-          if (needsFaceVerification) {
-            // Navigate to face verification with user data
-            router.replace({
-              pathname: "auth/face-verification",
-              params: {
-                firstName: result.data.user.first_name,
-                lastName: result.data.user.last_name,
-                email: result.data.user.email,
-                userId: result.data.user.id,
-              },
-            });
-          } else {
-            // Navigate directly to home for users with avatar
-            router.replace("/pages/home");
-          }
+        console.log("Avatar URL:", result.data.user.avatar_url);
+        console.log("Needs face verification:", needsFaceVerification);
+
+        if (needsFaceVerification) {
+          // Navigate to face verification with user data
+          router.replace({
+            pathname: "auth/face-verification",
+            params: {
+              firstName: result.data.user.first_name,
+              lastName: result.data.user.last_name,
+              email: result.data.user.email,
+              userId: result.data.user.id,
+            },
+          });
         } else {
-          Alert.alert("Error", "Failed to save login data");
+          // Navigate directly to home for users with avatar
+          router.replace("/pages/home");
         }
       } else {
-        Alert.alert("Login Failed", result.error || "Invalid credentials");
+        Alert.alert("Error", "Failed to save login data");
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      Alert.alert("Error", "Something went wrong. Please try again.");
+    } else {
+      Alert.alert("Login Failed", result.error || "Invalid credentials");
     }
-  };
+  } catch (err) {
+    console.error("Login error:", err);
+    Alert.alert("Error", "Something went wrong. Please try again.");
+  }
+};
 
   return (
     <SafeAreaView className="flex-1">

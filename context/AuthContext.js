@@ -2,6 +2,7 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { OnboardingManager } from "../Halper/OnboardingManager";
 
 const BASE_URL = "https://api.unitec.run.place";
 const AuthContext = createContext(undefined);
@@ -49,7 +50,10 @@ export const AuthProvider = ({ children }) => {
         setRefreshToken(savedRefresh);
         tokenRef.current = savedToken;
         setUser(JSON.parse(savedUser));
-        scheduleTokenRefresh(); // start auto refresh timer
+        
+        // Mark auth onboarding as completed when user is found
+        await OnboardingManager.completeAuthOnboarding();
+        scheduleTokenRefresh();
       }
     } catch (error) {
       console.error("Error loading auth:", error);
@@ -72,7 +76,9 @@ export const AuthProvider = ({ children }) => {
         SecureStore.setItemAsync("userData", JSON.stringify(userData)),
       ]);
 
-      scheduleTokenRefresh(); // start auto refresh
+      // Mark auth onboarding as completed on successful login
+      await OnboardingManager.completeAuthOnboarding();
+      scheduleTokenRefresh();
       return true;
     } catch (error) {
       console.error("Login save error:", error);
@@ -96,55 +102,93 @@ export const AuthProvider = ({ children }) => {
   const refreshAccessToken = async () => {
     try {
       const savedRefresh = await SecureStore.getItemAsync("refreshToken");
-      if (!savedRefresh) throw new Error("No refresh token found");
+      if (!savedRefresh) {
+        console.error("❌ No refresh token found");
+        return;
+      }
 
+      console.log("🔄 Refreshing access token...");
+      
       const response = await axios.post(`${BASE_URL}/api/v1/auth/refresh`, {
         refresh_token: savedRefresh,
       });
 
-      // Your API response format:
-      // { "access_token": "...", "refresh_token": "...", "token_type": "bearer" }
-
-      const { access_token, refresh_token: newRefresh } = response.data;
+      const { access_token, refresh_token: newRefreshToken } = response.data;
 
       if (access_token) {
+        // ✅ Update access token
         await SecureStore.setItemAsync("authToken", access_token);
-        if (newRefresh) await SecureStore.setItemAsync("refreshToken", newRefresh);
-
         setToken(access_token);
         tokenRef.current = access_token;
-        if (newRefresh) setRefreshToken(newRefresh);
 
-        if (setTokenGlobally) setTokenGlobally(access_token);
+        // ✅ Update refresh token if new one is provided
+        if (newRefreshToken) {
+          await SecureStore.setItemAsync("refreshToken", newRefreshToken);
+          setRefreshToken(newRefreshToken);
+          console.log("✅ Refresh token updated");
+        }
 
-        // Schedule next refresh
+        // ✅ Update global token if set
+        if (setTokenGlobally) {
+          setTokenGlobally(access_token);
+        }
+
+        // ✅ Schedule next refresh
         scheduleTokenRefresh();
 
-        console.log("✅ Token refreshed successfully");
+        console.log("✅ Access token refreshed successfully");
+        
+        return {
+          success: true,
+          access_token: access_token,
+          refresh_token: newRefreshToken
+        };
       } else {
-        console.warn("⚠️ Refresh API returned no token");
+        console.warn("⚠️ Refresh API returned no access token");
+        return { success: false, error: "No access token in response" };
       }
     } catch (error) {
       console.error("❌ Token refresh failed:", error);
-      logout(); // optional: logout if refresh fails
+      
+      // Check if it's an authentication error (invalid refresh token)
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        console.log("🔄 Refresh token expired, logging out...");
+        logout(); // logout if refresh token is invalid
+      }
+      
+      return { success: false, error: error.message };
     }
   };
 
+  // ✅ Manual token refresh function (for external use)
+  const manualRefreshToken = async () => {
+    return await refreshAccessToken();
+  };
+
+  // ✅ Logout function - ONLY clear auth data, NOT onboarding
   const logout = async () => {
-    if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    }
 
     setToken(null);
     setUser(null);
     setRefreshToken(null);
     tokenRef.current = null;
 
+    // ONLY delete auth related data, NOT onboarding data
     await Promise.all([
       SecureStore.deleteItemAsync("authToken"),
       SecureStore.deleteItemAsync("refreshToken"),
       SecureStore.deleteItemAsync("userData"),
     ]);
+
+    // Onboarding status remains intact! ✅
+    console.log("✅ Logout successful - Onboarding status preserved");
   };
 
+  // ✅ Update user data
   const updateUserData = async (updatedData) => {
     if (!user) return false;
     try {
@@ -162,20 +206,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // ✅ Update user avatar
   const updateUserAvatar = async (avatarUrl) => {
     return updateUserData({ avatar_url: avatarUrl });
+  };
+
+  // ✅ Get valid token (for API calls)
+  const getValidToken = () => tokenRef.current;
+
+  // ✅ Check if token refresh is needed
+  const isTokenExpired = async () => {
+    // You can implement token expiration check logic here
+    // For now, we'll rely on the automatic refresh
+    return false;
   };
 
   const value = {
     user,
     token,
+    refreshToken,
     login,
     logout,
     loading,
     isAuthenticated: !!token,
     updateUserAvatar,
     updateUserData,
-    getValidToken: () => tokenRef.current,
+    getValidToken,
+    refreshAccessToken: manualRefreshToken, // Export for external use
+    isTokenExpired,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
