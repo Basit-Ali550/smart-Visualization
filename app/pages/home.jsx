@@ -16,7 +16,7 @@ const mockData = {
       id: 1,
       title: "Modern Living Room",
       image:
-        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=100&fit=crop",
+        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=200&fit=crop",
       lastEdited: "Today",
       style: "Modern",
     },
@@ -52,7 +52,7 @@ const DashboardScreen = () => {
   // Render recent project item
   const renderProjectItem = ({ item }) => (
     <TouchableOpacity
-      onPress={() => router.push("/pages/profile")}
+      // onPress={() => router.push("/pages/profile")}
       className="p-3 bg-white flex-1 m-2 rounded-xl"
     >
       <View className="relative">
@@ -167,7 +167,7 @@ const DashboardScreen = () => {
             </View>
           </View>
           <Button
-            // onPress={() => router.push("/pages/interior-design")} // ✅ Expo Router
+            onPress={() => router.push("/pages/interior-design")} // ✅ Expo Router÷
             variant="primary"
           >
             Start project
@@ -192,7 +192,7 @@ const DashboardScreen = () => {
             </View>
           </View>
           <Button
-            // onPress={() => router.push("/pages/exterior-design")} // ✅ Expo Router
+            onPress={() => router.push("/pages/exterior-design")} 
             variant="primary"
           >
             Start project
@@ -204,7 +204,7 @@ const DashboardScreen = () => {
           <View className="flex-row justify-between items-center mb-4">
             <Text16Bold>Recent Projects</Text16Bold>
             <TouchableOpacity
-            // onPress={() => router.push("/pages/my-projects")} // ✅ Expo Router
+            onPress={() => router.push("/pages/my-projects")} // ✅ Expo Router
             >
               <Text className="text-[#0461A6]">View all</Text>
             </TouchableOpacity>
@@ -225,7 +225,7 @@ const DashboardScreen = () => {
           <View className="flex-row justify-between items-center mb-4">
             <Text16Bold>Popular Styles</Text16Bold>
             <TouchableOpacity
-            // onPress={() => router.push("/pages/styles")} // ✅ Expo Router
+            onPress={() => router.push("/pages/SelectMaterials")} // ✅ Expo Router
             >
               <Text className="text-[#0461A6]">View all</Text>
             </TouchableOpacity>

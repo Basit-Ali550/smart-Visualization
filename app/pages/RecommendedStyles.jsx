@@ -137,7 +137,7 @@ const RecommendedStyles = () => {
         <View className="flex-1 ml-2">
           <Button
             variant="primary"
-            onPress={() => router.push("Pages/SelectColorsScreen")}
+            onPress={() => router.push("pages/SelectColorsScreen")}
           >
             Continue to color
           </Button>

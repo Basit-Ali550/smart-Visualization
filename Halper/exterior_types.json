@@ -1,0 +1,34 @@
+[
+    {
+        "name": "Garage",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411358_Garage.jpg"
+    },
+    {
+        "name": "Deck & Patio",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411359_Deck_&_Patio.svg"
+    },
+    {
+        "name": "Balcony",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411360_Balcony.jpg"
+    },
+    {
+        "name": "Doors & Windows",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411360_Doors_&_Windows.svg"
+    },
+    {
+        "name": "Roof",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411361_Roof.svg"
+    },
+    {
+        "name": "Landscaping",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411361_Landscaping.svg"
+    },
+    {
+        "name": "House Facade",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411362_House_Facade.svg"
+    },
+    {
+        "name": "Siding",
+        "image_url": "https://d1f94twjwnuv8l.cloudfront.net/exterior/types/1762411362_Siding.svg"
+    }
+]

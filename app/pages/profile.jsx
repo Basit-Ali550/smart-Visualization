@@ -2,25 +2,33 @@ import { Feather } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import { useState } from "react";
+import { Formik } from "formik";
+import { useRef, useState } from "react";
 import {
   Alert,
   Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Yup from "yup";
 import Appreance from "../../assets/Icon/Appreance.svg";
 import Notification from "../../assets/Icon/Notification.svg";
 import PersonIcon from "../../assets/Icon/PersonIcon.svg";
 import Shield from "../../assets/Icon/Shield.svg";
 import Button from "../../components/ui/Button";
+import InputField from "../../components/ui/InputFeild";
 import ToggleButton from "../../components/ui/ToggleButton";
 import { Text12, Text14, Text16Bold } from "../../components/ui/Typography";
 import { useAuth } from "../../context/AuthContext";
+import apiClient from "../../hooks/apiClient";
 import usePost from "../../hooks/usePost";
 
 const ProfileScreen = () => {
@@ -28,14 +36,71 @@ const ProfileScreen = () => {
   const [appearance, setAppearance] = useState(false);
   const [uploading, setUploading] = useState(false);
 
+  // Modal states
+  const [modalVisible, setModalVisible] = useState(false);
+  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const firstNameInputRef = useRef(null);
+  const lastNameInputRef = useRef(null);
+
   const { user, logout, token, updateUserData } = useAuth();
   const { postData, loading } = usePost("api/v1/auth/logout");
   const router = useRouter();
 
-  // Image Upload Handler - ONLY for profile picture
+  // === PERSONAL INFO MODAL ===
+  const handlePersonalInfo = () => {
+    setFirstName(user?.first_name || "");
+    setLastName(user?.last_name || "");
+    setModalVisible(true);
+    setTimeout(() => firstNameInputRef.current?.focus(), 300);
+  };
+
+  const handleSaveNames = async () => {
+    if (!firstName.trim() || !lastName.trim()) {
+      Alert.alert("Error", "Both fields are required.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const formData = new FormData();
+      formData.append("first_name", firstName.trim());
+      formData.append("last_name", lastName.trim());
+
+      const response = await apiClient.patch("/api/v1/users/profile", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data) {
+        await updateUserData({
+          ...user,
+          first_name: response.data.first_name,
+          last_name: response.data.last_name,
+        });
+
+        Alert.alert("Success", "Name updated successfully!");
+        setModalVisible(false);
+      }
+    } catch (error) {
+      console.error("Name update error:", error);
+      const msg =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to update name. Please try again.";
+      Alert.alert("Error", msg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // === PROFILE PICTURE UPLOAD ===
   const handleProfilePictureUpload = async () => {
     try {
-      // Request camera and gallery permissions
       const { status: cameraStatus } =
         await ImagePicker.requestCameraPermissionsAsync();
       const { status: galleryStatus } =
@@ -49,20 +114,10 @@ const ProfileScreen = () => {
         return;
       }
 
-      // Show action sheet for camera or gallery
       Alert.alert("Update Profile Picture", "Choose an option", [
-        {
-          text: "Take Photo",
-          onPress: takePhoto,
-        },
-        {
-          text: "Choose from Gallery",
-          onPress: pickImage,
-        },
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
+        { text: "Take Photo", onPress: takePhoto },
+        { text: "Choose from Gallery", onPress: pickImage },
+        { text: "Cancel", style: "cancel" },
       ]);
     } catch (error) {
       console.error("Error requesting permissions:", error);
@@ -70,7 +125,6 @@ const ProfileScreen = () => {
     }
   };
 
-  // Take photo with camera
   const takePhoto = async () => {
     try {
       const result = await ImagePicker.launchCameraAsync({
@@ -80,16 +134,14 @@ const ProfileScreen = () => {
         quality: 0.8,
       });
 
-      if (!result.canceled && result.assets && result.assets.length > 0) {
+      if (!result.canceled && result.assets?.[0]?.uri) {
         await uploadImage(result.assets[0].uri);
       }
     } catch (error) {
-      console.error("Camera error:", error);
       Alert.alert("Error", "Failed to take photo.");
     }
   };
 
-  // Pick image from gallery
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -99,28 +151,17 @@ const ProfileScreen = () => {
         quality: 0.8,
       });
 
-      if (!result.canceled && result.assets && result.assets.length > 0) {
+      if (!result.canceled && result.assets?.[0]?.uri) {
         await uploadImage(result.assets[0].uri);
       }
     } catch (error) {
-      console.error("Gallery error:", error);
-      Alert.alert("Error", "Failed to pick image from gallery.");
+      Alert.alert("Error", "Failed to pick image.");
     }
   };
 
-  // Upload image to server
   const uploadImage = async (imageUri) => {
     try {
       setUploading(true);
-
-      // Get token from SecureStore
-      const authToken = await SecureStore.getItemAsync("authToken");
-
-      if (!authToken) {
-        throw new Error("No authentication token found");
-      }
-
-      // Create FormData
       const formData = new FormData();
       formData.append("avatar", {
         uri: imageUri,
@@ -128,73 +169,77 @@ const ProfileScreen = () => {
         name: `avatar_${user?.id || "user"}_${Date.now()}.jpg`,
       });
 
-      // Add name fields if available to maintain existing data
-      if (user?.first_name) {
-        formData.append("first_name", user.first_name);
-      }
-      if (user?.last_name) {
-        formData.append("last_name", user.last_name);
-      }
+      if (user?.first_name) formData.append("first_name", user.first_name);
+      if (user?.last_name) formData.append("last_name", user.last_name);
 
-      // Make PATCH request
-      const response = await fetch(
-        "https://api.unitec.run.place/api/v1/users/profile",
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: formData,
-        }
-      );
+      const response = await apiClient.patch("/api/v1/users/profile", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Upload failed: ${response.status} - ${errorText}`);
-      }
-
-      const result = await response.json();
-
-      // Update user data in context
-      if (updateUserData && result) {
+      if (response.data?.avatar_url) {
         await updateUserData({
           ...user,
-          avatar_url: result.avatar_url,
+          avatar_url: response.data.avatar_url,
         });
-        console.log("✅ User avatar updated in context");
+        Alert.alert("Success", "Profile picture updated!");
       }
-
-      Alert.alert("Success", "Profile picture updated successfully!");
     } catch (error) {
-      console.error("💥 Upload Error:", error);
+      console.error("Upload error:", error);
       Alert.alert(
         "Upload Failed",
-        error.message || "Failed to upload image. Please try again."
+        error.response?.data?.message || "Could not upload image."
       );
     } finally {
       setUploading(false);
     }
   };
 
-  const handlePersonalInfo = () => {
-    // Navigate to personal info screen or show info
-    Alert.alert(
-      "Personal Information",
-      "This section will open personal information settings."
-    );
-  };
-
+  // === SECURITY MODAL - CHANGE PASSWORD ===
   const handleSecurity = () => {
-    // Navigate to security screen or show info
-    Alert.alert("Security", "This section will open security settings.");
+    setPasswordModalVisible(true);
   };
 
+  const changePasswordSchema = Yup.object().shape({
+    current_password: Yup.string()
+      .min(6, "Current password must be at least 6 characters")
+      .required("Current password is required"),
+    new_password: Yup.string()
+      .min(6, "New password must be at least 6 characters")
+      .required("New password is required"),
+    new_password_confirm: Yup.string()
+      .oneOf([Yup.ref("new_password")], "Passwords must match")
+      .required("Confirm new password is required"),
+  });
+
+  const handleChangePassword = async (values, { setSubmitting, setFieldError }) => {
+    try {
+      await apiClient.post("/api/v1/auth/change-password", {
+        current_password: values.current_password,
+        new_password: values.new_password,
+        new_password_confirm: values.new_password_confirm,
+      });
+
+      Alert.alert("Success", "Password changed successfully!");
+      setPasswordModalVisible(false);
+    } catch (error) {
+      console.error("Change password error:", error);
+      const msg = error.response?.data?.message || "Failed to change password.";
+      if (error.response?.data?.errors) {
+        Object.keys(error.response.data.errors).forEach((key) => {
+          setFieldError(key, error.response.data.errors[key][0]);
+        });
+      } else {
+        Alert.alert("Error", msg);
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // === LOGOUT ===
   const handleLogout = async () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
+      { text: "Cancel", style: "cancel" },
       {
         text: "Logout",
         style: "destructive",
@@ -209,33 +254,24 @@ const ProfileScreen = () => {
         refresh_token: token,
         logout_all_devices: false,
       };
-
-      const result = await postData(payload);
-
-      if (result.success) {
-        await logout();
-        router.replace("/auth/login");
-      } else {
-        await logout();
-        router.replace("/auth/login");
-      }
+      await postData(payload);
     } catch (error) {
       console.error("Logout error:", error);
+    } finally {
       await logout();
       router.replace("/auth/login");
     }
   };
 
   return (
-    <SafeAreaView className="flex-1 ">
+    <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
       >
-        {/* Profile Section - ONLY this section is clickable for upload */}
+        {/* Profile Section */}
         <View className="items-center mt-6">
           <View className="relative">
-            {/* Profile Image - Clickable for upload */}
             <TouchableOpacity
               onPress={handleProfilePictureUpload}
               disabled={uploading}
@@ -251,12 +287,10 @@ const ProfileScreen = () => {
               />
             </TouchableOpacity>
 
-            {/* Camera Icon Overlay - Also clickable */}
             <TouchableOpacity
               className="absolute bottom-0 right-0 bg-blue-500 w-8 h-8 rounded-full items-center justify-center border-2 border-white"
               onPress={handleProfilePictureUpload}
               disabled={uploading}
-              activeOpacity={0.7}
             >
               {uploading ? (
                 <Feather name="loader" size={14} color="#fff" />
@@ -269,30 +303,29 @@ const ProfileScreen = () => {
           <Text16Bold className="mt-2">
             {user?.first_name} {user?.last_name}
           </Text16Bold>
-          <Text14 className="">{user?.email}</Text14>
+          <Text14>{user?.email}</Text14>
         </View>
 
         {/* Stats */}
         <View className="flex-row justify-center gap-4 mt-4 space-x-8">
           <View className="items-center">
             <Text16Bold>24</Text16Bold>
-            <Text12 className="">Projects</Text12>
+            <Text12>Projects</Text12>
           </View>
           <View className="items-center">
-            <Text16Bold className="font-bold">136</Text16Bold>
+            <Text16Bold>136</Text16Bold>
             <Text12>Materials</Text12>
           </View>
           <View className="items-center">
-            <Text16Bold className="text-lg font-bold">4.8</Text16Bold>
+            <Text16Bold>4.8</Text16Bold>
             <Text12>Rating</Text12>
           </View>
         </View>
 
         {/* Account Settings */}
-        <View className="mt-6  bg-white p-4 rounded-xl">
+        <View className="mt-6 bg-white p-4 rounded-xl ">
           <Text16Bold className="mb-2">Account Settings</Text16Bold>
 
-          {/* Personal Information - Different handler, NO upload */}
           <TouchableOpacity
             className="flex-row items-center justify-between py-4 border-b-[1px] border-[#EBEDF0]"
             onPress={handlePersonalInfo}
@@ -303,7 +336,7 @@ const ProfileScreen = () => {
                 <PersonIcon />
               </View>
               <View className="ml-3">
-                <Text className=" text-[#000000] font-semibold text-sm">
+                <Text className="text-[#000000] font-semibold text-sm">
                   Personal Information
                 </Text>
                 <Text className="text-[#A5A5A5] text-[10px] font-normal">
@@ -313,6 +346,7 @@ const ProfileScreen = () => {
             </View>
             <AntDesign name="right" size={14} color="#767C8C" />
           </TouchableOpacity>
+
           <TouchableOpacity
             className="flex-row items-center justify-between py-4 border-b-[1px] border-[#EBEDF0]"
             onPress={handleSecurity}
@@ -323,7 +357,7 @@ const ProfileScreen = () => {
                 <Shield />
               </View>
               <View className="ml-3">
-                <Text className=" text-[#000000] font-semibold text-sm">
+                <Text className="text-[#000000] font-semibold text-sm">
                   Security
                 </Text>
                 <Text className="text-[#A5A5A5] text-[10px] font-normal">
@@ -334,14 +368,13 @@ const ProfileScreen = () => {
             <AntDesign name="right" size={14} color="#767C8C" />
           </TouchableOpacity>
 
-          {/* Notifications Toggle - No upload functionality */}
           <View className="flex-row items-center justify-between py-4 border-b-[1px] border-[#EBEDF0]">
             <View className="flex-row items-center">
               <View className="p-2 bg-[#E6F6FF] rounded-lg">
                 <Notification />
               </View>
               <View className="ml-3">
-                <Text className=" text-[#000000] font-semibold text-sm">
+                <Text className="text-[#000000] font-semibold text-sm">
                   Notifications
                 </Text>
                 <Text className="text-[#A5A5A5] text-[10px] font-normal">
@@ -352,14 +385,13 @@ const ProfileScreen = () => {
             <ToggleButton value={notifications} onToggle={setNotifications} />
           </View>
 
-          {/* Appearance Toggle - No upload functionality */}
-          <View className="flex-row items-center justify-between bg-white pt-4 rounded-xl">
+          <View className="flex-row items-center justify-between pt-4">
             <View className="flex-row items-center">
               <View className="p-2 bg-[#FEE9EA] rounded-lg">
                 <Appreance />
               </View>
               <View className="ml-3">
-                <Text className=" text-[#000000] font-semibold text-sm">
+                <Text className="text-[#000000] font-semibold text-sm">
                   Appearance
                 </Text>
                 <Text className="text-[#A5A5A5] text-[10px] font-normal">
@@ -371,38 +403,25 @@ const ProfileScreen = () => {
           </View>
         </View>
 
-        {/* Free Plan - Not clickable for upload */}
         <View className="bg-white mt-6 p-4 rounded-xl">
-          <Text16Bold className=" mb-2">Free Plan</Text16Bold>
+          <Text16Bold className="mb-2">Free Plan</Text16Bold>
           <Text14>
             Upgrade to unlock all features and export unlimited designs
           </Text14>
 
           <View className="mt-3 space-y-3">
-            <View className="flex-row items-center mb-2">
-              <View className="w-5 h-5 rounded-full bg-[#0461A6] flex items-center justify-center">
-                <Feather name="check" size={12} color="#fff" />
-              </View>
-              <Text className="text-[#000000] text-sm  font-normal ml-2">
-                5 projects limit
-              </Text>
-            </View>
-            <View className="flex-row items-center mb-2 ">
-              <View className="w-5 h-5 rounded-full bg-[#0461A6] flex items-center justify-center">
-                <Feather name="check" size={12} color="#fff" />
-              </View>
-              <Text className="text-[#000000] text-sm  font-normal ml-2">
-                Basic materials
-              </Text>
-            </View>
-            <View className="flex-row items-center mb-2">
-              <View className="w-5 h-5 rounded-full bg-[#0461A6] flex items-center justify-center">
-                <Feather name="check" size={12} color="#fff" />
-              </View>
-              <Text className="text-[#000000] text-sm  font-normal ml-2">
-                No PDF export
-              </Text>
-            </View>
+            {["5 projects limit", "Basic materials", "No PDF export"].map(
+              (item, i) => (
+                <View key={i} className="flex-row items-center">
+                  <View className="w-5 h-5 rounded-full bg-[#0461A6] flex items-center justify-center">
+                    <Feather name="check" size={12} color="#fff" />
+                  </View>
+                  <Text className="text-[#000000] text-sm font-normal ml-2">
+                    {item}
+                  </Text>
+                </View>
+              )
+            )}
           </View>
 
           <Button variant="primary" className="mt-4">
@@ -419,6 +438,208 @@ const ProfileScreen = () => {
           {loading ? "Logging out..." : "Log out"}
         </Button>
       </ScrollView>
+
+      {/* === PERSONAL INFO MODAL === */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="flex-1 justify-center"
+        >
+          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+            <View className="flex-1 bg-black/60 justify-center items-center px-6">
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View className="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl">
+                  <View className="px-6 pt-8 pb-6 border-b border-gray-100">
+                    <Text className="text-xl font-bold text-center text-gray-900">
+                      Edit Personal Information
+                    </Text>
+                  </View>
+
+                  <View className="px-6 py-6 space-y-5">
+                    <View>
+                      <Text className="text-sm font-semibold text-gray-700 mb-2">
+                        First Name
+                      </Text>
+                      <TextInput
+                        ref={firstNameInputRef}
+                        value={firstName}
+                        onChangeText={setFirstName}
+                        placeholder="Enter first name"
+                        className="border border-gray-300 rounded-xl px-4 py-4 text-base bg-gray-50"
+                        autoCapitalize="words"
+                        returnKeyType="next"
+                        onSubmitEditing={() => lastNameInputRef.current?.focus()}
+                      />
+                    </View>
+
+                    <View>
+                      <Text className="text-sm font-semibold text-gray-700 mb-2">
+                        Last Name
+                      </Text>
+                      <TextInput
+                        ref={lastNameInputRef}
+                        value={lastName}
+                        onChangeText={setLastName}
+                        placeholder="Enter last name"
+                        className="border border-gray-300 rounded-xl px-4 py-4 text-base bg-gray-50"
+                        autoCapitalize="words"
+                        returnKeyType="done"
+                        onSubmitEditing={handleSaveNames}
+                      />
+                    </View>
+                  </View>
+
+                  <View className="px-6 pb-8 pt-4 bg-gray-50/50">
+                    <View className="flex-row gap-3">
+                      <TouchableOpacity
+                        onPress={() => setModalVisible(false)}
+                        disabled={saving}
+                        className="flex-1 bg-gray-200 py-4 rounded-xl justify-center items-center active:opacity-70"
+                      >
+                        <Text className="text-gray-800 font-semibold text-base">
+                          Cancel
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        onPress={handleSaveNames}
+                        disabled={saving}
+                        className="flex-1 bg-blue-600 py-4 rounded-xl justify-center items-center active:opacity-80"
+                      >
+                        {saving ? (
+                          <View className="flex-row items-center">
+                            <Feather name="loader" size={18} color="white" className="animate-spin mr-2" />
+                            <Text className="text-white font-semibold text-base">
+                              Saving...
+                            </Text>
+                          </View>
+                        ) : (
+                          <Text className="text-white font-semibold text-base">
+                            Save Changes
+                          </Text>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* === CHANGE PASSWORD MODAL === */}
+      <Modal
+        visible={passwordModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPasswordModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="flex-1 justify-center"
+        >
+          <TouchableWithoutFeedback onPress={() => setPasswordModalVisible(false)}>
+            <View className="flex-1 bg-black/60 justify-center items-center px-6">
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View className="bg-gray-100 w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl">
+                  <View className="px-6 pt-8 pb-6 border-b border-gray-100">
+                    <Text className="text-xl font-bold text-center text-gray-900">
+                      Change Password
+                    </Text>
+                  </View>
+
+                  <Formik
+                    initialValues={{
+                      current_password: "",
+                      new_password: "",
+                      new_password_confirm: "",
+                    }}
+                    validationSchema={changePasswordSchema}
+                    onSubmit={handleChangePassword}
+                  >
+                    {({
+                      handleSubmit,
+                      isSubmitting,
+                      values,
+                      errors,
+                      touched,
+                      handleChange,
+                      handleBlur,
+                    }) => (
+                      <>
+                        <View className="px-4 py-6 space-y-5">
+                          <InputField
+                            label="Current Password"
+                            name="current_password"
+                            type="password"
+                            placeholder="Enter current password"
+                            required
+                          />
+                          <InputField
+                          className="py-6"
+
+                            label="New Password"
+                            name="new_password"
+                            type="password"
+                            placeholder="Enter new password"
+                            required
+                          />
+                          <InputField
+                            label="Confirm New Password"
+                            name="new_password_confirm"
+                            type="password"
+                            placeholder="Confirm new password"
+                            required
+                          />
+                        </View>
+
+                        <View className="px-6 pb-8 pt-4 bg-gray-50/50">
+                          <View className="flex-row gap-3">
+                            <TouchableOpacity
+                              onPress={() => setPasswordModalVisible(false)}
+                              disabled={isSubmitting}
+                              className="flex-1 bg-gray-200 py-4 rounded-xl justify-center items-center active:opacity-70"
+                            >
+                              <Text className="text-gray-800 font-semibold text-base">
+                                Cancel
+                              </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              onPress={handleSubmit}
+                              disabled={isSubmitting}
+                              className="flex-1 bg-blue-600 py-4 rounded-xl justify-center items-center active:opacity-80"
+                            >
+                              {isSubmitting ? (
+                                <View className="flex-row items-center">
+                                  <Feather name="loader" size={18} color="white" className="animate-spin mr-2" />
+                                  <Text className="text-white font-semibold text-base">
+                                    Saving...
+                                  </Text>
+                                </View>
+                              ) : (
+                                <Text className="text-white font-semibold text-base">
+                                  Change Password
+                                </Text>
+                              )}
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      </>
+                    )}
+                  </Formik>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 };

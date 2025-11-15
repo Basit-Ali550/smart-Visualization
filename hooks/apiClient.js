@@ -1,54 +1,92 @@
-// hooks/apiClient.js
+// api/apiClient.js
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { setGlobalTokenUpdater } from '../context/AuthContext';
 
-// ✅ CORRECT Base URL (without trailing slash)
 const BASE_URL = "https://api.unitec.run.place";
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 30000,
+  timeout: 120000,
 });
 
-// Request Interceptor
+let updateTokenInContext = null;
+setGlobalTokenUpdater((updater) => {
+  updateTokenInContext = updater;
+});
+
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    error ? prom.reject(error) : prom.resolve(token);
+  });
+  failedQueue = [];
+};
+
 apiClient.interceptors.request.use(
   async (config) => {
-    try {
-      // Get token
-      const token = await SecureStore.getItemAsync('authToken');
-      
-      if (token && token !== 'null' && token !== 'undefined') {
-        config.headers.Authorization = `Bearer ${token}`;
-        console.log('✅ Token added to request');
-      }
-
-      // Multipart/Form-Data Handling
-      if (config.data instanceof FormData) {
-        delete config.headers['Content-Type'];
-        
-        console.log('📁 Multipart/Form-Data detected:');
-        console.log('🔹 Method:', config.method?.toUpperCase());
-        
-        // ✅ CORRECT URL will be: https://api.unitec.run.place/api/v1/users/profile
-        console.log('🔹 Final URL:', config.baseURL + '/' + config.url);
-        
-        console.log('🔹 FormData Parts:');
-        if (config.data._parts) {
-          config.data._parts.forEach(([key, value], index) => {
-            if (key === 'avatar' && typeof value === 'object') {
-              console.log(`   ${index}. ${key}: [FILE] ${value.name} (${value.type})`);
-            } else {
-              console.log(`   ${index}. ${key}: ${value}`);
-            }
-          });
-        }
-      }
-
-      return config;
-    } catch (error) {
-      console.error('Request interceptor error:', error);
-      return config;
+    const token = await SecureStore.getItemAsync('authToken');
+    if (token && token !== 'null') {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return apiClient(originalRequest);
+        }).catch(err => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const refreshToken = await SecureStore.getItemAsync('refreshToken');
+        if (!refreshToken) throw new Error('No refresh token');
+
+        // صرف یہی لائن اہم ہے — apiClient نہیں، axios استعمال کرو!
+        const response = await axios.post(`${BASE_URL}/api/v1/auth/refresh`, {
+          refresh_token: refreshToken,
+        });
+
+        const { access_token, refresh_token: newRefreshToken } = response.data.tokens;
+
+        await SecureStore.setItemAsync('authToken', access_token);
+        await SecureStore.setItemAsync('refreshToken', newRefreshToken || refreshToken);
+
+        if (updateTokenInContext) updateTokenInContext(access_token);
+
+        processQueue(null, access_token);
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        return apiClient(originalRequest);
+
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        await Promise.all([
+          SecureStore.deleteItemAsync('authToken'),
+          SecureStore.deleteItemAsync('refreshToken'),
+          SecureStore.deleteItemAsync('userData'),
+        ]);
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+    return Promise.reject(error);
   }
 );
 

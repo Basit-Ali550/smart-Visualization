@@ -9,7 +9,7 @@ export default function AuthLayout() {
       <Stack.Screen name="newpassword" />
       <Stack.Screen name="otpscreen" />
       <Stack.Screen name="forgotpassword" />
-        <Stack.Screen name="face-verification" options={{ headerShown: false }} />
+      <Stack.Screen name="face-verification" options={{ headerShown: false }} />
     </Stack>
   );
 }
