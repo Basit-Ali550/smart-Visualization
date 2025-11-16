@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useNavigation } from "@react-navigation/native";
 import AiLight from "../../assets/images/AiLight.svg";
 import Back from "../../assets/images/back.svg";
 import BestPrectice from "../../assets/images/BestPrectice.jpg";
@@ -28,12 +27,11 @@ import { Text14, Text16Bold } from "../../components/ui/Typography";
 const UploadPhotoScreen = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const navigation = useNavigation();
-  
+
   const params = useLocalSearchParams();
   const router = useRouter();
-  
-  const { path, roomType, elementName, selectedStyle } = params;
+
+  const { path, roomType, elementName } = params;
   const checkImageSize = (image) => {
     return new Promise((resolve) => {
       if (!image || !image.uri) {
@@ -58,10 +56,10 @@ const UploadPhotoScreen = () => {
   const handleImageSelection = async (result) => {
     if (!result.canceled && result.assets && result.assets[0]) {
       const image = result.assets[0];
-      
+
       // Check image size
       const meetsSizeRequirement = await checkImageSize(image);
-      
+
       if (!meetsSizeRequirement) {
         Alert.alert(
           "Image Too Small",
@@ -79,7 +77,8 @@ const UploadPhotoScreen = () => {
   // GALLERY → FULL IMAGE (NO CROP)
   const pickImageFromGallery = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert("Permission needed", "Please allow access to photos");
         return;
@@ -87,7 +86,7 @@ const UploadPhotoScreen = () => {
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: false,    // CROP PURA BAND
+        allowsEditing: false, // CROP PURA BAND
         quality: 1,
       });
 
@@ -106,7 +105,7 @@ const UploadPhotoScreen = () => {
       }
 
       const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: false,    // CROP PURA BAND
+        allowsEditing: false, // CROP PURA BAND
         quality: 1,
       });
 
@@ -116,19 +115,19 @@ const UploadPhotoScreen = () => {
     }
   };
 
-const handleUsePhoto = () => {
-  setShowConfirmation(false);
+  const handleUsePhoto = () => {
+    setShowConfirmation(false);
 
-  router.push({
-    pathname: "/pages/interior-exterior-style",
-    params: {
-      path,
-      roomType: roomType || "",
-      elementName: elementName || "",
-      photo: JSON.stringify(selectedImage), // Pass photo forward
-    },
-  });
-};
+    router.push({
+      pathname: "/pages/interior-exterior-style",
+      params: {
+        path,
+        roomType: roomType || "",
+        elementName: elementName || "",
+        photo: JSON.stringify(selectedImage), // Pass photo forward
+      },
+    });
+  };
 
   const ConfirmationModal = () => (
     <Modal
@@ -212,7 +211,8 @@ const handleUsePhoto = () => {
               Upload Your {roomType || elementName} Photo
             </Text16Bold>
             <Text14 className="text-[#767C8C] text-center leading-6">
-              Upload a photo of your {path === "exterior" ? "facade" : "room"} to explore styles and materials.
+              Upload a photo of your {path === "exterior" ? "facade" : "room"}{" "}
+              to explore styles and materials.
             </Text14>
           </View>
 
@@ -222,7 +222,9 @@ const handleUsePhoto = () => {
                 <AiLight />
                 <View className="flex-1">
                   <Text14 className="text-grayLight">
-                    AI guidance: Make sure your {path === "exterior" ? "facade" : "room"} is well-lit for best results
+                    AI guidance: Make sure your{" "}
+                    {path === "exterior" ? "facade" : "room"} is well-lit for
+                    best results
                   </Text14>
                   <Text14 className="text-grayLight mt-1">
                     • Minimum image size: 550px × 550px

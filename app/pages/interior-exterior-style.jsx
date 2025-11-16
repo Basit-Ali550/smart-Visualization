@@ -16,7 +16,7 @@ import { Text20 } from "../../components/ui/Typography";
 import exteriorStyles from "../../Halper/exterior_styles.json";
 import interiorStyles from "../../Halper/interior_styles.json";
 
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
 import Animated from "react-native-reanimated";
 import Ai from "../../assets/Icon/Ai.svg";
 
@@ -45,7 +45,7 @@ const InteriorExteriorStyle = () => {
         path,
         roomType: roomType || "",
         elementName: elementName || "",
-        photo: JSON.stringify(parsedPhoto),
+        photo: photo,
       },
     });
   };
@@ -150,13 +150,11 @@ const InteriorExteriorStyle = () => {
         </View>
 
         <Text20 className=" font-bold text-[#333]">
-Popular Design Styles
+          Popular Design Styles
         </Text20>
-
         <Text className=" text-gray-600 mb-2">
-       Select a style to visualize your space
+          Select a style to visualize your space
         </Text>
-
         <FlatList
           data={stylesData}
           renderItem={({ item }) => <StyleCard item={item} />}
@@ -166,7 +164,6 @@ Popular Design Styles
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 120 }}
         />
-
         {/* Fixed Button */}
         <View className="absolute bottom-8 left-6 right-6">
           <Button
