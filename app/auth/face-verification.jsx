@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Defs, Ellipse, Mask, Rect } from "react-native-svg";
 import Face from "../../assets/images/Face.svg";
 import Button from "../../components/ui/Button";
-import { Text16, Text16Bold, Text24 } from "../../components/ui/Typography";
+import { Text16, Text16Bold, Text20 } from "../../components/ui/Typography";
 import { useAuth } from "../../context/AuthContext";
 
 const FaceVerificationScreen = () => {
@@ -158,7 +158,7 @@ const FaceVerificationScreen = () => {
   if (!permission.granted) {
     return (
       <SafeAreaView className="flex-1 bg-white justify-center items-center px-6">
-        <Text24 className="text-center mb-4">Camera Permission Required</Text24>
+        <Text20 className="text-center mb-4">Camera Permission Required</Text20>
         <Text16 className="text-center mb-8 text-gray-600">
           We need camera access for face verification.
         </Text16>

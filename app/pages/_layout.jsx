@@ -6,11 +6,12 @@ export default function PagesLayout() {
       <Stack.Screen name="home" />
       <Stack.Screen name="exterior-design" />
       <Stack.Screen name="interior-design" />
-            <Stack.Screen name="interior-exterior-style" />
+      <Stack.Screen name="interior-exterior-style" />
       <Stack.Screen name="project-details-form" />
       <Stack.Screen name="save-project" />
 
       <Stack.Screen name="compare-result" />
+      <Stack.Screen name="RecommendedStyles" />
 
       <Stack.Screen name="settings" />
       <Stack.Screen name="profile" />

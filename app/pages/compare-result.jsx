@@ -1,9 +1,11 @@
-import Feather from '@expo/vector-icons/Feather';
+import Feather from "@expo/vector-icons/Feather";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
-import { GestureHandlerRootView, PanGestureHandler } from "react-native-gesture-handler";
-import Button from "../../components/ui/Button";
+import {
+  GestureHandlerRootView,
+  PanGestureHandler,
+} from "react-native-gesture-handler";
 
 const { width, height } = Dimensions.get("window");
 
@@ -30,7 +32,7 @@ export default function CompareResult() {
         style={{ zIndex: 10 }}
       >
         <TouchableOpacity onPress={() => router.back()}>
-<Feather name="arrow-left" size={24} color="white" />
+          <Feather name="arrow-left" size={24} color="white" />
         </TouchableOpacity>
         <Text className="text-white text-lg font-semibold">
           Transformation Comparison
@@ -43,7 +45,14 @@ export default function CompareResult() {
         {/* AI Generated Image (background) */}
         <Image
           source={{ uri: generatedImage }}
-          style={{ width, height, position: "absolute", top: 0, left: 0,  bottom:0}}
+          style={{
+            width,
+            height,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            bottom: 0,
+          }}
           resizeMode="cover"
         />
 
@@ -91,9 +100,7 @@ export default function CompareResult() {
         className="absolute bottom-10 w-full left-0 right-0 items-center"
         style={{ zIndex: 10 }}
       >
-<Button className="w-full px-40">
-    Download
-</Button>
+        {/* <Button className="w-full px-40">Download</Button> */}
       </View>
     </GestureHandlerRootView>
   );

@@ -1,5 +1,5 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -158,9 +158,28 @@ const SelectColorsScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newColorHex, setNewColorHex] = useState("#3a86ff");
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const { path, roomType, elementName, selectedStyle, photo } = params;
 
   const handleSelectPalette = (palette) => {
     setSelectedPalette(palette);
+  };
+  const handleContinue = () => {
+    console.log(selectedPalette.colors.join(", "));
+    if (!selectedPalette?.colors) return;
+
+    router.push({
+      pathname: "/pages/project-details-form",
+      // pathname: "/pages/SelectColorsScreen",
+      params: {
+        path,
+        roomType: roomType || "",
+        elementName: elementName || "",
+        selectedStyle: JSON.stringify(selectedStyle),
+        photo,
+        color: selectedPalette.colors.join(", "),
+      },
+    });
   };
 
   const handleNext = () => {
@@ -254,7 +273,7 @@ const SelectColorsScreen = () => {
 
       {/* Next Button */}
       <View>
-        <Button variant="primary" onPress={handleNext}>
+        <Button variant="primary" onPress={handleContinue}>
           Next
         </Button>
       </View>

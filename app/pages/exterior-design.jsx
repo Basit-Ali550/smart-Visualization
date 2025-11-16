@@ -1,4 +1,3 @@
-
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -12,26 +11,22 @@ import {
   Text16Bold,
   Text20,
 } from "../../components/ui/Typography";
-
 import Back from "../../assets/images/back.svg";
 import { exteriorRoomTypes } from "../../Halper/Constant";
-
 const ExteriorDesignScreen = () => {
   const router = useRouter();
   const [selectedRoom, setSelectedRoom] = useState(null);
-
   const handleContinue = () => {
-  if (selectedRoom) {
-    router.push({
-      pathname: "pages/interior-exterior-style",
-      params: {
-        path: "exterior",
-        elementName: selectedRoom.name,  // Facade, Backyard, etc.
-      },
-    });
-  }
-};
-
+    if (selectedRoom) {
+      router.push({
+        pathname: "/pages/upload-photo",
+        params: {
+          path: "exterior",
+          elementName: selectedRoom.name,
+        },
+      });
+    }
+  };
   const RoomGridItem = ({ item, isSelected, onPress }) => {
     const ImageComponent = item.image;
 
