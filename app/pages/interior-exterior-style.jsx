@@ -37,7 +37,6 @@ const InteriorExteriorStyle = () => {
   const isExterior = path === "exterior";
   const stylesData = isExterior ? exteriorStyles : interiorStyles;
 
-  // Navigate to RecommendedStyles screen
   const getAIRecommendations = () => {
     router.push({
       pathname: "/pages/RecommendedStyles",
@@ -54,7 +53,8 @@ const InteriorExteriorStyle = () => {
     if (!selectedStyle) return;
 
     router.push({
-      pathname: "/pages/project-details-form",
+      // pathname: "/pages/project-details-form",
+      pathname: "/pages/SelectColorsScreen",
       params: {
         path,
         roomType: roomType || "",

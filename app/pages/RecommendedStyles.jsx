@@ -84,7 +84,6 @@ const RecommendedStyles = () => {
       const apiKey = "AIzaSyAKx6GienYoifGEEbR2gA67BSFmBxJhyBE";
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-      // Define allowed styles based on interior/exterior
       const allowedStyles = isExterior
         ? "No Style, Modern, Mediterranean, International, Moody Colors, Wood Accents, Bohemian, Industrial, Retreat, Elegant, Painted Brick, Red Brick, Modern Blend, Stone Clad, Glass House, Ranch, Modern Farm House, Portuguese, Traditional, Craftsman, Tudor, Prairie, Chalet, Colonial, Dutch Colonial, Georgian, Green, Contemporary, Christmas, Cottage, Farmhouse, French Country, Futuristic, Gothic, Greek Revival, Mansion, Townhouse, Victorian, Corporate Building, Baroque, Art Deco, Neo Classical, Mission Revival, Bauhaus, Rustic Modern, Tropical, Beach House, Urban Industrial, Victorian Gothic, Italianate, Spanish Colonial Revival, Desert Modern, Log Cabin, Eco Friendly, Alpine, Dutch Gable, A Frame, Shingle Style, Regency, Vernacular, Neo Tudor, Southwestern, Cape Cod, Federal, French Eclectic, Renaissance Revival, Split Level, Cuban Colonial, Modern Scandinavian"
         : "Modern, Mediterranean, International, Moody Colors, Wood Accents, Bohemian, Industrial, Retreat, Elegant, Painted Brick, Red Brick, Modern Blend, Stone Clad, Glass House, Ranch, Modern Farm House, Portuguese, Traditional, Craftsman, Tudor, Prairie, Chalet, Colonial, Dutch Colonial, Georgian, Green, Contemporary, Christmas, Cottage, Farmhouse, French Country, Futuristic, Gothic, Greek Revival, Mansion, Townhouse, Victorian, Corporate Building, Baroque, Art Deco, Neo Classical, Mission Revival, Bauhaus, Rustic Modern, Tropical, Beach House, Urban Industrial, Victorian Gothic, Italianate, Spanish Colonial Revival, Desert Modern, Log Cabin, Eco Friendly, Alpine, Dutch Gable, A Frame, Shingle Style, Regency, Vernacular, Neo Tudor, Southwestern, Cape Cod, Federal, French Eclectic, Renaissance Revival, Split Level, Cuban Colonial, Modern Scandinavian";
@@ -239,7 +238,8 @@ const RecommendedStyles = () => {
     );
 
     router.push({
-      pathname: "/pages/project-details-form",
+      // pathname: "/pages/project-details-form",
+      pathname: "/pages/SelectColorsScreen",
       params: {
         path,
         roomType: roomType || "",
