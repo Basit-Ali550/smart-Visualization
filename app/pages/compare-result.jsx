@@ -6,7 +6,6 @@ import {
   GestureHandlerRootView,
   PanGestureHandler,
 } from "react-native-gesture-handler";
-import Button from "../../components/ui/Button";
 
 const { width, height } = Dimensions.get("window");
 
@@ -101,7 +100,7 @@ export default function CompareResult() {
         className="absolute bottom-10 w-full left-0 right-0 items-center"
         style={{ zIndex: 10 }}
       >
-        <Button className="w-full px-40">Download</Button>
+        {/* <Button className="w-full px-40">Download</Button> */}
       </View>
     </GestureHandlerRootView>
   );
