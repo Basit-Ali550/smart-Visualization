@@ -3,12 +3,12 @@ import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    Dimensions,
-    FlatList,
-    Image,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../../components/ui/Button";
@@ -21,24 +21,25 @@ const CARD_WIDTH = (width - 48) / 2;
 const InteriorExteriorStyle = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { path, roomType, elementName } = params;
+ const { path, roomType, elementName, photo } = params;
+const parsedPhoto = photo ? JSON.parse(photo) : null;
   useEffect(() => {
   }, [path, roomType, elementName]);
   const isExterior = path === "exterior";
   const stylesData = isExterior ? exteriorStyles : interiorStyles;
 
   const [selectedStyle, setSelectedStyle] = useState(null);
-
 const handleContinue = () => {
   if (!selectedStyle) return;
 
   router.push({
-    pathname: "/pages/upload-photo",
+    pathname: "/pages/project-details-form",
     params: {
       path,
       roomType: roomType || "",
       elementName: elementName || "",
       selectedStyle: JSON.stringify(selectedStyle),
+      photo: JSON.stringify(parsedPhoto), // Forward photo
     },
   });
 };

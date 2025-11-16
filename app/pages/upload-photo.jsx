@@ -116,20 +116,19 @@ const UploadPhotoScreen = () => {
     }
   };
 
-  const handleUsePhoto = () => {
-    setShowConfirmation(false);
-    
-    router.push({
-      pathname: "/pages/project-details-form",
-      params: {
-        path: path,
-        roomType: roomType || "",
-        elementName: elementName || "",
-        selectedStyle: selectedStyle || "",
-        photo: JSON.stringify(selectedImage),
-      },
-    });
-  };
+const handleUsePhoto = () => {
+  setShowConfirmation(false);
+
+  router.push({
+    pathname: "/pages/interior-exterior-style",
+    params: {
+      path,
+      roomType: roomType || "",
+      elementName: elementName || "",
+      photo: JSON.stringify(selectedImage), // Pass photo forward
+    },
+  });
+};
 
   const ConfirmationModal = () => (
     <Modal

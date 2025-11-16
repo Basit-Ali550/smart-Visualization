@@ -20,13 +20,13 @@ const ExteriorDesignScreen = () => {
   const router = useRouter();
   const [selectedRoom, setSelectedRoom] = useState(null);
 
-  const handleContinue = () => {
+const handleContinue = () => {
   if (selectedRoom) {
     router.push({
-      pathname: "pages/interior-exterior-style",
+      pathname: "/pages/upload-photo",
       params: {
         path: "exterior",
-        elementName: selectedRoom.name,  // Facade, Backyard, etc.
+        elementName: selectedRoom.name,
       },
     });
   }

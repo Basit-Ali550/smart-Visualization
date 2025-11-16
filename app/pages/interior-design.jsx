@@ -21,13 +21,13 @@ const InteriorDesignScreen = () => {
   const router = useRouter();
   const [selectedRoom, setSelectedRoom] = useState(null);
 
- const handleContinue = () => {
+const handleContinue = () => {
   if (selectedRoom) {
     router.push({
-      pathname: "pages/interior-exterior-style",
+      pathname: "/pages/upload-photo",
       params: {
         path: "interior",
-        roomType: selectedRoom.name,  // sirf name bhej rahe hain
+        roomType: selectedRoom.name,
       },
     });
   }
