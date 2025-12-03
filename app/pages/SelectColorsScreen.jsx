@@ -181,7 +181,7 @@ const SelectColorsScreen = () => {
       },
     });
   };
-
+  const parsedPhoto = photo ? JSON.parse(photo) : null;
   const handleNext = () => {
     if (selectedPalette) {
       // 🔑 AI Data Note: The array of hex codes is the data you pass to your AI
@@ -237,7 +237,11 @@ const SelectColorsScreen = () => {
 
       {/* Top Header Section */}
       <View className="p-4 bg-white rounded-xl flex-row gap-3 mb-5 items-center">
-        <HeaderIcon />
+        <Image
+          source={{ uri: parsedPhoto.uri }}
+          className="w-12 h-12 rounded-md"
+        />
+
         <View>
           <Text className="text-lg font-bold">Japanese Minimalism</Text>
           <Text className="text-sm text-gray-500">
