@@ -56,7 +56,6 @@ export default function CompareResult() {
           resizeMode="cover"
         />
 
-        {/* Original Image (foreground, width controlled by slider) */}
         <View
           style={{
             position: "absolute",
