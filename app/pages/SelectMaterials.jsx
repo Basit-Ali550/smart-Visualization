@@ -8,6 +8,7 @@ import {
   Image,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -39,7 +40,7 @@ const MaterialCardSkeleton = () => (
   >
     {/* Image Skeleton */}
     <View className="w-full h-[120px] bg-gray-200 rounded-t-[8px]" />
-    
+
     {/* Content Skeleton */}
     <View className="p-2">
       <View className="flex-row justify-between mb-2">
@@ -56,7 +57,9 @@ const MaterialCardSkeleton = () => (
 );
 
 // Skeleton array for loading state
-const skeletonData = Array.from({ length: 4 }, (_, index) => ({ id: `skeleton-${index}` }));
+const skeletonData = Array.from({ length: 4 }, (_, index) => ({
+  id: `skeleton-${index}`,
+}));
 
 const SelectMaterialsScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,26 +69,84 @@ const SelectMaterialsScreen = () => {
   const [allMaterials, setAllMaterials] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  
+
   const router = useRouter();
 
-  const { data: materialData, loading, error } = useGet(`/api/v1/materials?page=${page}&page_size=6`);
+  const {
+    data: materialData,
+    loading,
+    error,
+  } = useGet(`/api/v1/materials?page=${page}&page_size=6`);
 
-  // Combine materials when new data is fetched
+  // Filter function for materials
+  const filterMaterial = (material) => {
+    const matchesSearch =
+      material.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      material.material_type.toLowerCase().includes(searchQuery.toLowerCase());
+
+    let matchesFilter = true;
+    switch (activeFilter) {
+      case "interior":
+        matchesFilter = material.material_type
+          .toLowerCase()
+          .includes("interior");
+        break;
+      case "exterior":
+        matchesFilter = material.material_type
+          .toLowerCase()
+          .includes("exterior");
+        break;
+      case "recent":
+        const projectDate = new Date(material.created_at);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        matchesFilter = projectDate >= weekAgo;
+        break;
+      default:
+        matchesFilter = true;
+    }
+
+    return matchesSearch && matchesFilter;
+  };
+
+  // Handle data from API
   useEffect(() => {
     if (materialData?.materials) {
+      const newMaterials = materialData.materials;
+
+      // Check if any new materials match the current filter/search
+      const addedMatching = newMaterials.some(filterMaterial);
+
       if (page === 1) {
-        // First page - replace all materials
-        setAllMaterials(materialData.materials);
+        setAllMaterials(newMaterials);
       } else {
-        // Subsequent pages - append materials
-        setAllMaterials(prev => [...prev, ...materialData.materials]);
+        setAllMaterials((prev) => [...prev, ...newMaterials]);
       }
-      
-      // Check if there are more pages
-      setHasMore(page < materialData.total_pages);
+
+      // Set hasMore primarily based on items returned
+      let newHasMore = newMaterials.length >= 6;
+
+      // If total_pages is available, use it
+      if (materialData.total_pages) {
+        newHasMore = page < materialData.total_pages;
+      }
+
+      setHasMore(newHasMore);
+
+      // If no matching items added on subsequent pages, stop loading more
+      if (page > 1 && !addedMatching) {
+        setHasMore(false);
+      }
     }
-  }, [materialData, page]);
+  }, [materialData, page, searchQuery, activeFilter]); // Dependencies include filters to re-evaluate
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      setIsLoadingMore(false);
+      setHasMore(false);
+    }
+  }, [error]);
 
   // Reset pagination when filter or search changes
   useEffect(() => {
@@ -94,36 +155,42 @@ const SelectMaterialsScreen = () => {
     setHasMore(true);
   }, [activeFilter, searchQuery]);
 
-  const transformedMaterials = allMaterials.map(material => ({
+  const transformedMaterials = allMaterials.map((material) => ({
     id: material.id,
     price_per_sqft: `$${material.price_per_sqft}/sq ft`,
     material_type: material.material_type,
     thumbnail_url: material.thumbnail_url,
     quality: "High-quality image",
-    createdAt: "2024-01-15",
+    createdAt: material.created_at || "2024-01-15",
     category: material.material_type,
     title: material.name,
     image: material.thumbnail_url,
     rating: material.rating,
-    is_favorite: material.is_favorite
+    is_favorite: material.is_favorite,
   }));
 
   const filteredMaterials = transformedMaterials.filter((material) => {
-    const matchesSearch = material.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase()) ||
+    const matchesSearch =
+      material.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       material.material_type.toLowerCase().includes(searchQuery.toLowerCase());
 
     let matchesFilter = true;
     switch (activeFilter) {
       case "interior":
-        matchesFilter = material.material_type.toLowerCase().includes("interior");
+        matchesFilter = material.material_type
+          .toLowerCase()
+          .includes("interior");
         break;
       case "exterior":
-        matchesFilter = material.material_type.toLowerCase().includes("exterior");
+        matchesFilter = material.material_type
+          .toLowerCase()
+          .includes("exterior");
         break;
       case "recent":
-        matchesFilter = true;
+        const projectDate = new Date(material.createdAt);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        matchesFilter = projectDate >= weekAgo;
         break;
       default:
         matchesFilter = true;
@@ -132,7 +199,7 @@ const SelectMaterialsScreen = () => {
     return matchesSearch && matchesFilter;
   });
 
-    const getUniqueKey = (item, index) => {
+  const getUniqueKey = (item, index) => {
     return `${item.id}-${index}`;
   };
 
@@ -140,7 +207,7 @@ const SelectMaterialsScreen = () => {
   const loadMore = useCallback(() => {
     if (!loading && !isLoadingMore && hasMore) {
       setIsLoadingMore(true);
-      setPage(prev => prev + 1);
+      setPage((prev) => prev + 1);
     }
   }, [loading, isLoadingMore, hasMore]);
 
@@ -219,8 +286,8 @@ const SelectMaterialsScreen = () => {
 
   // Footer component for loading indicator
   const ListFooterComponent = () => {
-    if (!isLoadingMore) return null;
-    
+    if (!isLoadingMore || !hasMore) return null;
+
     return (
       <View className="py-4">
         <ActivityIndicator size="small" color="#0461A6" />
@@ -242,6 +309,11 @@ const SelectMaterialsScreen = () => {
               <Text20 className="text-[18px] text-[#464646] text-center font-bold">
                 Material Catalog
               </Text20>
+            </View>
+
+            {/* Search Bar Skeleton */}
+            <View className="mb-4">
+              <View className="h-12 bg-gray-200 rounded-xl animate-pulse" />
             </View>
 
             {/* Filter Tabs Skeleton */}
@@ -280,7 +352,7 @@ const SelectMaterialsScreen = () => {
               scrollEnabled={false}
               showsVerticalScrollIndicator={false}
             />
-            
+
             {/* Button Skeleton */}
             <View className="mt-4">
               <View className="w-full h-12 bg-gray-300 rounded-lg" />
@@ -295,7 +367,11 @@ const SelectMaterialsScreen = () => {
     return (
       <SafeAreaView className="flex-1 justify-center items-center">
         <Text>Error loading materials: {error.message}</Text>
-        <Button onPress={() => router.back()} variant="primary" className="mt-4">
+        <Button
+          onPress={() => router.back()}
+          variant="primary"
+          className="mt-4"
+        >
           Go Back
         </Button>
       </SafeAreaView>
@@ -310,6 +386,26 @@ const SelectMaterialsScreen = () => {
             <Text20 className="text-[18px] text-[#464646] text-center font-bold">
               Material Catalog
             </Text20>
+          </View>
+
+          {/* Search Bar */}
+          <View className="mb-4">
+            <View className="flex-row items-center bg-white px-3 rounded-xl py-2.5">
+              <Feather name="search" size={20} color="#767C8C" />
+              <TextInput
+                placeholder="Search materials..."
+                placeholderTextColor="#767C8C"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                className="flex-1 ml-3 py-1 text-[16px] font-[Montserrat]"
+                style={{ fontWeight: "500" }}
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery("")}>
+                  <Feather name="x" size={20} color="#767C8C" />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
 
           <View className="mb-2">
@@ -351,6 +447,13 @@ const SelectMaterialsScreen = () => {
               ListFooterComponent={ListFooterComponent}
               contentContainerStyle={{ paddingBottom: 20 }}
             />
+          ) : hasMore || loading || isLoadingMore ? (
+            <View className="items-center justify-center py-16">
+              <ActivityIndicator size="large" color="#0461A6" />
+              <Text16Bold className="text-gray-500 mt-4">
+                Loading materials...
+              </Text16Bold>
+            </View>
           ) : (
             <View className="items-center justify-center py-16">
               <Feather name="folder" size={64} color="#D1D5DB" />
@@ -364,14 +467,14 @@ const SelectMaterialsScreen = () => {
               </Text14>
             </View>
           )}
-          
+
           <View className="mt-4 px-4">
             <Button
               onPress={() => {
                 if (selectedMaterialId) {
                   router.push({
                     pathname: "pages/MaterialDetails",
-                    params: { materialId: selectedMaterialId }
+                    params: { materialId: selectedMaterialId },
                   });
                 } else {
                   alert("Please select a material first");
@@ -381,7 +484,9 @@ const SelectMaterialsScreen = () => {
               className="w-full"
               disabled={!selectedMaterialId}
             >
-              {selectedMaterialId ? "Visualize my design" : "Select a material to continue"}
+              {selectedMaterialId
+                ? "Visualize my design"
+                : "Select a material to continue"}
             </Button>
           </View>
         </View>
@@ -390,4 +495,4 @@ const SelectMaterialsScreen = () => {
   );
 };
 
-export default SelectMaterialsScreen; 
+export default SelectMaterialsScreen;

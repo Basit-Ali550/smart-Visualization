@@ -1,11 +1,13 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react"; // For handling adding state
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Back from "../../assets/images/back.svg";
 import Button from "../../components/ui/Button";
 import Header from "../../components/ui/Header";
 import { Text12, Text14, Text16Bold } from "../../components/ui/Typography";
+import apiClient from "../../hooks/apiClient"; // Import apiClient for POST request
 import useGet from "../../hooks/useGet";
 
 const Frame5 = require("../../assets/images/Frame 5.png");
@@ -16,8 +18,8 @@ const ImageSkeleton = () => (
 );
 
 const TextSkeleton = ({ width = "100%", height = 16, className = "" }) => (
-  <View 
-    className={`bg-gray-300 rounded ${className}`} 
+  <View
+    className={`bg-gray-300 rounded ${className}`}
     style={{ width, height }}
   />
 );
@@ -56,10 +58,15 @@ const SimilarMaterialSkeleton = () => (
 const MaterialDetails = () => {
   const router = useRouter();
   const { materialId } = useLocalSearchParams();
-  
+  const [isAdding, setIsAdding] = useState(false); // State to handle adding in progress
+
   // Fetch main material details
-  const { data: materialData, loading, error } = useGet(`/api/v1/materials/${materialId}`);
-  
+  const {
+    data: materialData,
+    loading,
+    error,
+  } = useGet(`/api/v1/materials/${materialId}`);
+
   // Fetch similar materials
   const { data: similarMaterialsData, loading: similarLoading } = useGet(
     materialId ? `/api/v1/materials/${materialId}/similar?limit=3` : null
@@ -80,16 +87,22 @@ const MaterialDetails = () => {
     const hasHalfStar = rating % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
-      stars.push(<AntDesign key={`full-${i}`} name="star" size={20} color="#FFD700" />);
+      stars.push(
+        <AntDesign key={`full-${i}`} name="star" size={20} color="#FFD700" />
+      );
     }
 
     if (hasHalfStar) {
-      stars.push(<AntDesign key="half" name="star" size={20} color="#FFD700" />);
+      stars.push(
+        <AntDesign key="half" name="star" size={20} color="#FFD700" />
+      );
     }
 
     const emptyStars = 5 - stars.length;
     for (let i = 0; i < emptyStars; i++) {
-      stars.push(<AntDesign key={`empty-${i}`} name="star" size={20} color="#EBEDF0" />);
+      stars.push(
+        <AntDesign key={`empty-${i}`} name="star" size={20} color="#EBEDF0" />
+      );
     }
 
     return stars;
@@ -98,8 +111,25 @@ const MaterialDetails = () => {
   const handleSimilarMaterialPress = (similarMaterialId) => {
     router.push({
       pathname: "pages/MaterialDetails",
-      params: { materialId: similarMaterialId }
+      params: { materialId: similarMaterialId },
     });
+  };
+
+  const handleAddToMyMaterials = async () => {
+    if (isAdding) return;
+    setIsAdding(true);
+    try {
+      await apiClient.post("/api/v1/user/materials", {
+        material_id: materialId,
+      });
+      router.push("/pages/user-materials"); // Navigate on success
+    } catch (err) {
+      console.error("Failed to add material:", err);
+      // Optionally: Add toast or alert for error
+      alert("This material is already in your materials.");
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   // Loading state with skeleton
@@ -116,7 +146,7 @@ const MaterialDetails = () => {
             rightWidth={60}
           />
         </View>
-        
+
         <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
           {/* Image Skeleton */}
           <View className="relative">
@@ -216,7 +246,11 @@ const MaterialDetails = () => {
         </View>
         <View className="flex-1 justify-center items-center">
           <Text>Error loading material: {error.message}</Text>
-          <Button onPress={() => router.back()} variant="primary" className="mt-4">
+          <Button
+            onPress={() => router.back()}
+            variant="primary"
+            className="mt-4"
+          >
             Go Back
           </Button>
         </View>
@@ -240,7 +274,11 @@ const MaterialDetails = () => {
         </View>
         <View className="flex-1 justify-center items-center">
           <Text>Material not found</Text>
-          <Button onPress={() => router.back()} variant="primary" className="mt-4">
+          <Button
+            onPress={() => router.back()}
+            variant="primary"
+            className="mt-4"
+          >
             Go Back
           </Button>
         </View>
@@ -265,17 +303,17 @@ const MaterialDetails = () => {
 
         {/* Material Image */}
         <View className="relative">
-          <Image 
-            source={{ uri: material.image_url || material.thumbnail_url }} 
-            className="w-full h-[140px] rounded-2xl" 
+          <Image
+            source={{ uri: material.image_url || material.thumbnail_url }}
+            className="w-full h-[140px] rounded-2xl"
             defaultSource={Frame5}
           />
 
           <View className="absolute right-3 top-3 bg-white/40 blur-sm p-2 rounded-full">
-            <AntDesign 
-              name={material.is_favorite ? "heart" : "hearto"} 
-              size={24} 
-              color={material.is_favorite ? "#E02227" : "#FFFFFF"} 
+            <AntDesign
+              name={material.is_favorite ? "heart" : "hearto"}
+              size={24}
+              color={material.is_favorite ? "#E02227" : "#FFFFFF"}
             />
           </View>
         </View>
@@ -284,13 +322,15 @@ const MaterialDetails = () => {
           {/* Title + SKU */}
           <Text16Bold>{material.name}</Text16Bold>
           <Text12 className="mt-2">SKU: {material.sku}</Text12>
-          <Text12 className="mt-1">Price: ${material.price_per_sqft}/sq ft</Text12>
+          <Text12 className="mt-1">
+            Price: ${material.price_per_sqft}/sq ft
+          </Text12>
 
           {/* Supplier */}
           <View className="mt-3 p-4 flex flex-row gap-4 items-center bg-white rounded-xl">
-            <Image 
-              source={{ uri: material.supplier_logo_url }} 
-              className="w-10 h-10 rounded-[8px]" 
+            <Image
+              source={{ uri: material.supplier_logo_url }}
+              className="w-10 h-10 rounded-[8px]"
               defaultSource={Frame5}
             />
             <View>
@@ -331,9 +371,7 @@ const MaterialDetails = () => {
           {/* Description */}
           <View className="mt-4">
             <Text16Bold>Description</Text16Bold>
-            <Text12 className="mt-1">
-              {material.description}
-            </Text12>
+            <Text12 className="mt-1">{material.description}</Text12>
           </View>
 
           {/* Common Uses */}
@@ -349,7 +387,10 @@ const MaterialDetails = () => {
             ) : commonUses.length > 0 ? (
               <View className="flex-row flex-wrap mt-2 gap-2">
                 {commonUses.map((use, index) => (
-                  <View key={use.id} className="p-1.5 rounded-[4px] bg-[#FFFFFF]">
+                  <View
+                    key={use.id}
+                    className="p-1.5 rounded-[4px] bg-[#FFFFFF]"
+                  >
                     <Text className="text-[#464646] text-sm font-medium">
                       {use.name}
                     </Text>
@@ -357,7 +398,9 @@ const MaterialDetails = () => {
                 ))}
               </View>
             ) : (
-              <Text12 className="text-gray-500 mt-2">No common uses specified</Text12>
+              <Text12 className="text-gray-500 mt-2">
+                No common uses specified
+              </Text12>
             )}
           </View>
 
@@ -392,9 +435,9 @@ const MaterialDetails = () => {
                     onPress={() => handleSimilarMaterialPress(item.id)}
                     className="w-[30%] border border-white bg-white overflow-hidden rounded-[8px] items-center"
                   >
-                    <Image 
-                      source={{ uri: item.thumbnail_url }} 
-                      className="w-full h-16" 
+                    <Image
+                      source={{ uri: item.thumbnail_url }}
+                      className="w-full h-16"
                       defaultSource={Frame5}
                     />
                     <Text className="text-[#000000] font-medium text-xs py-2 text-center">
@@ -404,7 +447,9 @@ const MaterialDetails = () => {
                 ))
               ) : (
                 // Fallback if no similar materials
-                <Text12 className="text-gray-500">No similar materials found</Text12>
+                <Text12 className="text-gray-500">
+                  No similar materials found
+                </Text12>
               )}
             </View>
           </View>
@@ -412,8 +457,12 @@ const MaterialDetails = () => {
 
         {/* Button */}
         <View className="mb-6">
-          <Button onPress={() => router.push("Pages/SaveExportDesign")}>
-            Add to my materials
+          <Button
+            onPress={handleAddToMyMaterials}
+            disabled={isAdding}
+            variant="primary"
+          >
+            {isAdding ? "Adding..." : "Add to my materials"}
           </Button>
         </View>
       </ScrollView>
