@@ -408,7 +408,7 @@ const SelectMaterialsScreen = () => {
             </View>
           </View>
 
-          <View className="mb-2">
+          {/* <View className="mb-2">
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -423,7 +423,7 @@ const SelectMaterialsScreen = () => {
                 />
               ))}
             </ScrollView>
-          </View>
+          </View> */}
         </View>
 
         <View className="mb-4">
